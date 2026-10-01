@@ -161,6 +161,8 @@ details summary{cursor:pointer;color:var(--teal);font-weight:600;font-size:.92re
 .fbp .wrong{color:var(--red);text-decoration:line-through;text-decoration-thickness:1.5px}
 .fbp .right{color:var(--green);font-weight:700}
 .version{border-left:3px solid var(--teal);padding:4px 0 4px 16px;white-space:pre-wrap}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:50;background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;box-shadow:var(--shadow);animation:in .3s ease}
+.resume-bar{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-color:var(--amber)}
 .verdict{font-size:.92rem;padding:8px 12px;border-radius:10px;background:var(--line);align-self:flex-start}
 .verdict.green{background:var(--green-soft)}.verdict.amber{background:var(--amber-soft)}.verdict.red{background:var(--red-soft)}
 .good{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:12px;background:var(--green-soft)}
@@ -396,30 +398,59 @@ const today=()=>dkey();
 function starterDeck(){const now=Date.now(),o={};STARTER_CARDS.forEach(([nl,en,ex],i)=>o["s"+i]={nl,en,ex,src:"start",due:now-(STARTER_CARDS.length-i)*1000,created:now});return o;}
 const lsGet=k=>{try{return JSON.parse(localStorage.getItem(k)||"null");}catch(e){return null;}};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}};
-const wq={deck:Promise.resolve(),profile:Promise.resolve()},wt={};
-function save(which){
+const wq={deck:Promise.resolve(),profile:Promise.resolve(),resume:Promise.resolve()},wt={},lastSaved={};
+let bootDone=false;
+function bodyFor(which){return which==="deck"?{cards:state.cards}:which==="profile"?state.profile:resumeBody();}
+function save(which,now){
+  if(which==="resume"&&!bootDone)return;
   clearTimeout(wt[which]);
-  wt[which]=setTimeout(()=>{
-    const body=JSON.parse(JSON.stringify(which==="deck"?{cards:state.cards}:state.profile));
+  const run=()=>{
+    const body=JSON.parse(JSON.stringify(bodyFor(which))),str=JSON.stringify(body);
+    if(lastSaved[which]===str)return;lastSaved[which]=str;
     lsSet("we_"+which,body);
     if(db&&uid) wq[which]=wq[which].then(()=>db.doc("data/users/"+uid+"/"+which).set(body)).catch(e=>{storeMsg="Opslaan in je account lukte niet ("+(e&&e.code||"fout")+"). Je voortgang staat wel in deze browser.";render();});
-  },500);
+  };
+  if(now)run();else wt[which]=setTimeout(run,400);
 }
+/* Waar je gebleven was: sessie en opdracht worden na elke stap bewaard */
+function resumeBody(){
+  return {date:today(),view,
+    S:S.active?{date:S.date,step:S.step,queue:S.queue,idx:S.idx,flipped:S.flipped,input:S.input,text:S.text,fb:S.fb,reviewed:S.reviewed,added:S.added,elapsed:Math.round((Date.now()-S.start)/1000)}:null,
+    T:T.active?{t:T.t,elapsed:taskElapsed(),text:T.text,fb:T.fb,chat:T.chat,checked:T.checked}:null};
+}
+function applyResume(r){
+  if(!r)return false;
+  let restored=false;
+  if(r.S&&r.S.date===today()){Object.assign(S,r.S,{active:true,loading:false,err:""});S.start=Date.now()-(r.S.elapsed||0)*1000;}
+  if(r.T&&r.T.t){Object.assign(T,r.T,{active:true,loading:false,err:"",summary:null,paused:true});}
+  if(r.view==="sessie"&&S.active){view="sessie";restored=true;}
+  else if(r.view==="taak"&&T.active){resumeTask(true);restored=true;}
+  return restored;
+}
+function toast(msg){const t=document.createElement("div");t.className="toast";t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3600);}
+addEventListener("pagehide",()=>save("resume",true));
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")save("resume",true);});
 async function boot(){
-  const lc=lsGet("we_deck"),lp=lsGet("we_profile");
+  const lc=lsGet("we_deck"),lp=lsGet("we_profile");let resume=lsGet("we_resume");
   state.cards=(lc&&lc.cards)||starterDeck();
   if(lp) Object.assign(state.profile,lp);
   render();
-  if(!window.claude||!window.claude.use){storeMsg="Je gebruikt een losse kopie. Open Other Biscuit via claude.ai voor feedback van Claude en om je voortgang op te slaan.";render();return;}
+  if(!window.claude||!window.claude.use){storeMsg="Je gebruikt een losse kopie. Open Other Biscuit via claude.ai voor feedback van Claude en om je voortgang op te slaan.";finishBoot(resume);return;}
   claude.use("sample").then(s=>{sample=s;render();});
   const [d,u]=await Promise.all([claude.use("db"),claude.use("user")]);
   if(d&&u){const id=await u.id();if(id){db=d;uid=id;storeMode="account";
-    try{const [dk,pf]=await Promise.all([db.doc("data/users/"+uid+"/deck").get(),db.doc("data/users/"+uid+"/profile").get()]);
+    try{const [dk,pf,rs]=await Promise.all([db.doc("data/users/"+uid+"/deck").get(),db.doc("data/users/"+uid+"/profile").get(),db.doc("data/users/"+uid+"/resume").get()]);
+      if(rs.exists) resume=rs.data();
       if(dk.exists) state.cards=dk.data().cards||{}; else save("deck");
       if(pf.exists) state.profile=Object.assign({days:{},mistakes:{},done:{},dailyIdx:0,lastDaily:"",sessions:{}},pf.data()); else save("profile");
     }catch(e){storeMsg="Je opgeslagen voortgang kon niet worden geladen. Je werkt nu met de versie in deze browser.";}}}
   if(storeMode==="lokaal"&&!storeMsg) storeMsg="Je voortgang wordt alleen in deze browser bewaard.";
-  render();
+  finishBoot(resume);
+}
+function finishBoot(resume){
+  const restored=applyResume(resume);
+  bootDone=true;render();
+  if(restored)toast("Je gaat verder waar je was gebleven.");
 }
 
 /* ================= Helpers ================= */
@@ -526,7 +557,10 @@ function applyFeedback(fb){
   (fb.punten||[]).forEach(p=>{const c=p.categorie||"overig";state.profile.mistakes[c]=(state.profile.mistakes[c]||0)+1;});
   save("deck");save("profile");return added;
 }
-function sampleError(e){const c=e&&e.code;
+let needLogin=false;
+const errHTML=msg=>msg?`<div class="err">${esc(msg)}${needLogin?`<div style="margin-top:10px"><button class="btn teal" id="loginBtn">Inloggen bij Claude</button></div>`:""}</div>`:"";
+function sampleError(e){const c=e&&e.code;needLogin=c==="login";
+  if(c==="login")return "Claude Code op je Mac is nog niet ingelogd. Klik op de knop hieronder, log in met je Claude-account en probeer het opnieuw.";
   if(c==="not_granted")return "Je hebt geen toestemming gegeven om Claude te gebruiken. Herlaad de pagina en kies 'Toestaan'.";
   if(c==="rate_limited")return "Je zit even aan je limiet van Claude. Probeer het over een paar minuten opnieuw.";
   if(e&&e.local&&e.message)return e.message;
@@ -568,6 +602,7 @@ function render(){
   const key=view||route;
   if(key!==lastScreen&&m.firstElementChild) m.firstElementChild.classList.add("enter");
   lastScreen=key;
+  save("resume");
 }
 const noticeHTML=()=>storeMsg?`<div class="notice">${esc(storeMsg)}</div>`:"";
 
@@ -582,14 +617,16 @@ function renderHome(m){
   m.innerHTML=`<div class="view">
     ${noticeHTML()}
     <div><p class="eyebrow">${new Date().toLocaleDateString("nl-NL",{weekday:"long",day:"numeric",month:"long"})}</p><h1>${greet()}.</h1></div>
+    ${pausedTaskHTML()}
     <section class="glass hero">
       <div class="stack">
         ${done?`<span class="chip green">${icon("check")} Sessie van vandaag gedaan</span>`:`<span class="chip amber">Dagelijkse sessie · ± 8 min</span>`}
         <h2>${done?"Goed bezig. Wil je nog iets extra's doen?":"Vandaag oefen je: "+esc(t.title)}</h2>
         <div class="plan"><span><i></i>${Math.min(dc,12)} kaarten herhalen</span><span><i style="background:var(--amber)"></i>${TYPE_LABEL[t.type]}: ${esc(t.title)}</span><span><i style="background:var(--green)"></i>Feedback van Claude</span></div>
         <div class="row" style="margin-top:6px">
-          <button class="btn primary big" id="startSession">${icon("play")} ${done?"Nog een sessie":"Start sessie"}</button>
-          ${done?`<button class="btn ghost big" data-go="opdrachten">Langere opdracht</button>`:""}
+          ${S.active?`<button class="btn primary big" id="continueSession">${icon("play")} Ga verder met je sessie</button><button class="btn link" id="startSession">Opnieuw beginnen</button>`
+          :`<button class="btn primary big" id="startSession">${icon("play")} ${done?"Nog een sessie":"Start sessie"}</button>
+          ${done?`<button class="btn ghost big" data-go="opdrachten">Langere opdracht</button>`:""}`}
         </div>
       </div>
       <div class="ring" role="img" aria-label="${mins} van ${goal} minuten vandaag">
@@ -613,6 +650,7 @@ function renderHome(m){
   </div>`;
   requestAnimationFrame(()=>requestAnimationFrame(()=>{const f=m.querySelector(".ring .fill");if(f)f.style.strokeDashoffset=f.dataset.off;}));
   $("#startSession").onclick=startSession;
+  if($("#continueSession"))$("#continueSession").onclick=()=>{view="sessie";render();window.scrollTo({top:0});};
   bindTaskCards(m);
   m.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
 }
@@ -621,7 +659,7 @@ function renderHome(m){
 const S={step:0,queue:[],idx:0,flipped:false,input:"",text:"",fb:null,loading:false,err:"",start:0,reviewed:0,added:0};
 const REVIEW_LIMIT=12;
 function startSession(){
-  Object.assign(S,{step:0,queue:due().slice(0,REVIEW_LIMIT).map(([id])=>id),idx:0,flipped:false,input:"",text:"",fb:null,loading:false,err:"",start:Date.now(),reviewed:0,added:0});
+  Object.assign(S,{active:true,date:today(),step:0,queue:due().slice(0,REVIEW_LIMIT).map(([id])=>id),idx:0,flipped:false,input:"",text:"",fb:null,loading:false,err:"",start:Date.now(),reviewed:0,added:0});
   if(!S.queue.length)S.step=1;
   view="sessie";render();window.scrollTo({top:0});
 }
@@ -655,7 +693,7 @@ function renderSession(m){
       <div class="brief">${esc(t.brief)}</div>
       ${t.type==="spreken"?DICTATE:""}
       <textarea id="dText" placeholder="${t.type==="spreken"?"Spreek in met dicteren, of typ wat je zou zeggen…":"Schrijf in het Engels…"}">${esc(S.text)}</textarea>
-      ${S.err?`<div class="err">${esc(S.err)}</div>`:""}
+      ${errHTML(S.err)}
       <div class="spread"><span class="small muted mono" id="wc">${wc(S.text)} woorden</span>
       <button class="btn primary" id="dSend" ${!sample||S.loading?"disabled":""}>${S.loading?'<span class="loading-dots">Claude leest mee</span>':icon("spark")+" Vraag feedback"}</button></div>
       ${needClaude()}
@@ -671,7 +709,7 @@ function renderSession(m){
       <div class="row" style="justify-content:center;margin-top:8px"><button class="btn ghost" data-go="opdrachten">Langere opdracht doen</button><button class="btn primary" data-go="vandaag">Terug naar vandaag</button></div></div>`;
   }
   m.innerHTML=`<div class="view">
-    ${S.step<3?`<div class="spread"><button class="btn link" id="exit">${icon("back")} Stoppen</button><span class="small muted">Dagelijkse sessie</span></div>${stepperHTML()}`:""}
+    ${S.step<3?`<div class="spread"><button class="btn link" id="exit">${icon("back")} Later verder</button><span class="small muted">Wordt na elke stap bewaard</span></div>${stepperHTML()}`:""}
     ${body}</div>`;
   const ex=$("#exit");if(ex)ex.onclick=()=>{view=null;render();};
   m.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
@@ -687,7 +725,7 @@ function renderSession(m){
     if(S.flipped) document.onkeydown=e=>{if(["1","2","3","4"].includes(e.key)&&view==="sessie"&&S.step===0&&S.flipped){const b=m.querySelector(`[data-g="${e.key}"]`);b&&b.click();}};
   }
   if(S.step===1){
-    const ta=$("#dText");ta.oninput=()=>{S.text=ta.value;$("#wc").textContent=wc(ta.value)+" woorden";};
+    const ta=$("#dText");ta.oninput=()=>{S.text=ta.value;$("#wc").textContent=wc(ta.value)+" woorden";save("resume");};
     $("#dSend").onclick=async()=>{
       if(S.text.trim().length<15){S.err="Schrijf of spreek eerst wat meer in.";return renderSession(m);}
       S.loading=true;S.err="";renderSession(m);
@@ -700,7 +738,7 @@ function renderSession(m){
     $("#finish").onclick=()=>{
       S.doneMins=Math.max(1,Math.round((Date.now()-S.start)/60000));addMinutes(S.doneMins);
       state.profile.sessions=state.profile.sessions||{};state.profile.sessions[today()]=true;save("profile");
-      S.step=3;render();confetti();
+      S.step=3;S.active=false;render();confetti();
     };
   }
 }
@@ -731,6 +769,7 @@ function renderTasks(m){
   const fbtn=(k,v,l)=>`<button data-f="${k}:${v}" aria-pressed="${TF[k]===v}">${l}</button>`;
   m.innerHTML=`<div class="view">
     ${noticeHTML()}
+    ${pausedTaskHTML()}
     <div><p class="eyebrow">Voor als je meer tijd hebt</p><h1>Opdrachten</h1><p class="muted" style="margin-top:8px;max-width:60ch">Elke opdracht heeft een geschatte duur en een stappenplan. Een timer houdt bij hoe lang je er echt over doet, zodat je ziet of je sneller wordt.</p></div>
     <div class="stack" style="gap:10px">
       <div class="filters" role="group" aria-label="Tijd">${fbtn("dur","alle","Alle tijden")}${fbtn("dur","kort","10 tot 15 min")}${fbtn("dur","middel","20 tot 30 min")}${fbtn("dur","lang","45 min")}</div>
@@ -761,12 +800,24 @@ function renderTasks(m){
 }
 
 /* ================= Actieve opdracht ================= */
-const T={t:null,start:0,elapsed:0,timer:null,text:"",fb:null,loading:false,err:"",chat:[],checked:[],summary:null};
+const T={t:null,active:false,paused:false,start:0,elapsed:0,timer:null,text:"",fb:null,loading:false,err:"",chat:[],checked:[],summary:null};
+const taskElapsed=()=>T.paused?T.elapsed:Math.floor((Date.now()-T.start)/1000);
 function startTask(t){
-  Object.assign(T,{t,start:Date.now(),elapsed:0,text:"",fb:null,loading:false,err:"",chat:[],checked:[],summary:null});
+  Object.assign(T,{t,active:true,paused:false,start:Date.now(),elapsed:0,text:"",fb:null,loading:false,err:"",chat:[],checked:[],summary:null});
   clearInterval(T.timer);T.timer=setInterval(tick,1000);
   view="taak";render();window.scrollTo({top:0});
   if(t.mode==="rollenspel")aiTurn();
+}
+function pauseTask(){T.elapsed=taskElapsed();T.paused=true;clearInterval(T.timer);}
+function resumeTask(silent){
+  T.start=Date.now()-T.elapsed*1000;T.paused=false;clearInterval(T.timer);T.timer=setInterval(tick,1000);view="taak";
+  if(!silent){render();window.scrollTo({top:0});}
+  if(T.t.mode==="rollenspel"&&!T.chat.length&&!T.fb)setTimeout(aiTurn,0);
+}
+function pausedTaskHTML(){
+  if(!T.active||view==="taak")return "";
+  return `<section class="glass pad resume-bar"><div class="stack" style="gap:2px"><span class="eyebrow">Je was hiermee bezig</span><h3>${esc(T.t.title)}</h3><span class="small muted mono">${fmtClock(T.elapsed)} van ${T.t.mins} min · alles is bewaard</span></div>
+    <div class="row"><button class="btn link" id="dropTask">Stoppen</button><button class="btn primary" id="resumeTask">${icon("play")} Ga verder</button></div></section>`;
 }
 function tick(){
   if(view!=="taak"||!T.t||T.summary)return;
@@ -794,7 +845,7 @@ async function sendTask(text,extra){
 function finishTask(){
   const t=T.t,mins=Math.max(1,Math.round(T.elapsed/60));
   const d=state.profile.done[t.id]||{count:0,totalMins:0,est:t.mins};d.count++;d.totalMins+=mins;d.est=t.mins;d.last=today();state.profile.done[t.id]=d;
-  addMinutes(mins);clearInterval(T.timer);T.summary={mins};render();confetti();
+  addMinutes(mins);clearInterval(T.timer);T.summary={mins};T.active=false;render();confetti();
 }
 function renderTask(m){
   const t=T.t;
@@ -823,7 +874,7 @@ function renderTask(m){
       <div class="spread"><span class="small muted mono" id="wc">${wc(T.text)} woorden</span><button class="btn primary" id="tSend" ${!sample||T.loading||T.fb?"disabled":""}>${T.loading?'<span class="loading-dots">Claude leest mee</span>':icon("spark")+" Vraag feedback"}</button></div>`;
   }
   m.innerHTML=`<div class="view">
-    <div class="spread"><button class="btn link" id="tBack">${icon("back")} Alle opdrachten</button><span class="chip ${t.mode==="rollenspel"?"amber":""}">${t.mode==="rollenspel"?"Rollenspel":TYPE_LABEL[t.type]}</span></div>
+    <div class="spread"><button class="btn link" id="tBack">${icon("back")} Later verder</button><span class="chip ${t.mode==="rollenspel"?"amber":""}">${t.mode==="rollenspel"?"Rollenspel":TYPE_LABEL[t.type]}</span></div>
     <section class="glass pad stack">
       <div class="task-head">
         <div class="stack" style="gap:8px"><h1 style="font-size:clamp(1.5rem,3.4vw,2.1rem)">${esc(t.title)}</h1><div class="brief">${esc(t.brief)}</div></div>
@@ -833,16 +884,16 @@ function renderTask(m){
       <div class="stack" style="gap:8px"><span class="eyebrow">Stappenplan · vink af wat je gedaan hebt</span>
         <ol class="steps">${t.steps.map(([s,mn],i)=>`<li class="${T.checked[i]?"done":""}"><button data-step="${i}"><span class="box">${icon("check")}</span><span class="txt">${esc(s)}</span><span class="chip line">${mn} min</span></button></li>`).join("")}</ol></div>
     </section>
-    <section class="glass pad stack">${work}${T.err?`<div class="err">${esc(T.err)}</div>`:""}${needClaude()}</section>
+    <section class="glass pad stack">${work}${errHTML(T.err)}${needClaude()}</section>
     ${T.fb?`<section class="glass pad stack"><h2>Feedback</h2>${feedbackHTML(T.fb)}</section>`:""}
     <div class="row" style="justify-content:flex-end"><button class="btn ${T.fb?"primary":"ghost"}" id="tDone">${T.fb?"Afronden en tijd opslaan":"Afronden zonder feedback"}</button></div>
   </div>`;
   const ta=$("#tText");
-  if(ta){ta.oninput=()=>{T.text=ta.value;const w=$("#wc");if(w)w.textContent=wc(ta.value)+" woorden";};}
+  if(ta){ta.oninput=()=>{T.text=ta.value;const w=$("#wc");if(w)w.textContent=wc(ta.value)+" woorden";save("resume");};}
   const ch=$("#chat");if(ch)ch.scrollTop=ch.scrollHeight;
-  $("#tBack").onclick=()=>{clearInterval(T.timer);view=null;route="opdrachten";render();};
+  $("#tBack").onclick=()=>{pauseTask();view=null;route="opdrachten";render();};
   $("#tDone").onclick=finishTask;
-  m.querySelectorAll("[data-step]").forEach(b=>b.onclick=()=>{const i=+b.dataset.step;T.checked[i]=!T.checked[i];b.parentElement.classList.toggle("done",T.checked[i]);});
+  m.querySelectorAll("[data-step]").forEach(b=>b.onclick=()=>{const i=+b.dataset.step;T.checked[i]=!T.checked[i];b.parentElement.classList.toggle("done",T.checked[i]);save("resume");});
   const say=()=>{const v=T.text.trim();if(!v||T.loading)return;T.chat.push({who:"me",text:v});T.text="";aiTurn();};
   if($("#tSay")){$("#tSay").onclick=say;ta.onkeydown=e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey))say();};if(!T.loading&&!T.fb)ta.focus({preventScroll:true});}
   if($("#tFb"))$("#tFb").onclick=()=>{
@@ -853,6 +904,17 @@ function renderTask(m){
   const speak=r=>{try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t.text);u.lang="en-GB";u.rate=r;speechSynthesis.speak(u);}catch(e){T.err="Voorlezen werkt niet in deze browser.";render();}};
   if($("#tts")){$("#tts").onclick=()=>speak(1);$("#ttsSlow").onclick=()=>speak(.75);$("#ttsStop").onclick=()=>{try{speechSynthesis.cancel();}catch(e){}};}
 }
+
+document.addEventListener("click",async e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.id==="resumeTask"){resumeTask();}
+  else if(b.id==="dropTask"){if(b.dataset.c){T.active=false;render();}else{b.dataset.c="1";b.textContent="Zeker? Je tekst gaat verloren";}}
+  else if(b.id==="loginBtn"){
+    b.disabled=true;
+    try{const r=await fetch("/api/login",{method:"POST"});if(!r.ok)throw 0;b.textContent="Log in via het venster dat net opende en klik daarna opnieuw op Vraag feedback";}
+    catch(_){b.textContent="Dubbelklik op 'Other Biscuit starten.command' om in te loggen";}
+  }
+});
 
 /* ================= Kaarten ================= */
 const KF={q:"",show:"alle"};

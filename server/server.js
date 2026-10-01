@@ -152,6 +152,14 @@ async function askClaude(input, tier) {
   throw new Error("Claude Code is niet gevonden op deze Mac. Open Terminal en typ: which claude. Krijg je een pad terug? Zet dat in een bestand .env in de app-map als CLAUDE_BIN=/dat/pad en start Other Biscuit opnieuw. Krijg je niets terug? Dubbelklik dan op \"Other Biscuit starten.command\", die installeert Claude Code voor je.");
 }
 
+// Opent Terminal met het inlogscherm van Claude Code.
+function openLoginTerminal() {
+  const bin = CLAUDE_BIN.replace(/'/g, "'\\''");
+  const cmd = `clear; echo 'Log in met je Claude-account (abonnement). Daarna kun je dit venster sluiten en terug naar Other Biscuit.'; echo; '${bin}' auth login --claudeai || '${bin}'`;
+  const script = `tell application "Terminal" to do script "${cmd.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"\ntell application "Terminal" to activate`;
+  spawn("osascript", ["-e", script], { stdio: "ignore", detached: true }).unref();
+}
+
 // ---------- HTTP ----------
 function send(res, status, body, type = "application/json; charset=utf-8") {
   res.writeHead(status, { "content-type": type, "cache-control": "no-store" });
@@ -182,7 +190,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "GET" && url.pathname === "/local-shim.js") return send(res, 200, fs.readFileSync(SHIM_FILE), "text/javascript; charset=utf-8");
     if (req.method === "GET" && url.pathname === "/api/ping") return send(res, 200, { ok: true, claude: CLAUDE_BIN ? "cli" : process.env.ANTHROPIC_API_KEY ? "api" : "geen" });
 
-    const dm = url.pathname.match(/^\/api\/data\/(deck|profile)$/);
+    const dm = url.pathname.match(/^\/api\/data\/(deck|profile|resume)$/);
     if (dm) {
       const file = path.join(DATA_DIR, dm[1] + ".json");
       if (req.method === "GET") return fs.existsSync(file) ? send(res, 200, fs.readFileSync(file)) : send(res, 404, { exists: false });
@@ -200,10 +208,18 @@ const server = http.createServer(async (req, res) => {
       const text = await askClaude(input, tier || "default");
       return send(res, 200, { text });
     }
+    if (req.method === "POST" && url.pathname === "/api/login") {
+      if (!CLAUDE_BIN) CLAUDE_BIN = findClaude();
+      if (!CLAUDE_BIN || process.platform !== "darwin") return send(res, 400, { error: "Inloggen kan alleen via het startbestand." });
+      openLoginTerminal();
+      return send(res, 200, { ok: true });
+    }
     send(res, 404, { error: "Niet gevonden" });
   } catch (e) {
     console.error(new Date().toISOString(), e);
-    send(res, 500, { error: e.message || String(e) });
+    const msg = e.message || String(e);
+    const login = /not logged in|\/login|please log ?in|invalid api key|oauth|authenticat/i.test(msg);
+    send(res, 500, { error: msg, code: login ? "login" : "error" });
   }
 });
 

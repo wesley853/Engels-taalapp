@@ -39,10 +39,21 @@ if [ -z "$CLAUDE_PATH" ]; then
   echo ""
   "$CLAUDE_PATH"
 fi
+# 4. Ingelogd? Zo niet: eenmalig inloggen
+if "$CLAUDE_PATH" auth status 2>/dev/null | grep -q '"loggedIn": *false'; then
+  echo ""
+  echo "=============================================================="
+  echo " Claude Code is nog niet ingelogd. Er opent zo een browser:"
+  echo " log in met je Claude-account (abonnement)."
+  echo "=============================================================="
+  echo ""
+  "$CLAUDE_PATH" auth login --claudeai
+fi
+
 mkdir -p logs data
 grep -q "^CLAUDE_BIN=" .env 2>/dev/null || echo "CLAUDE_BIN=$CLAUDE_PATH" >> .env
 
-# 4. Server (her)starten zodat altijd de nieuwste versie draait
+# 5. Server (her)starten zodat altijd de nieuwste versie draait
 pids=$(lsof -ti tcp:$PORT 2>/dev/null)
 [ -n "$pids" ] && kill $pids 2>/dev/null && sleep 0.5
 nohup node server/server.js > logs/server.log 2>&1 &

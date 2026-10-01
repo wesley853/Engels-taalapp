@@ -8,7 +8,7 @@
       body: JSON.stringify({ input, tier: (opts && opts.modelTier) || "default" }),
     });
     const j = await r.json().catch(() => ({}));
-    if (!r.ok) throw { code: "local", local: true, message: j.error || "De lokale server gaf een fout." };
+    if (!r.ok) throw { code: j.code === "login" ? "login" : "local", local: true, message: j.error || "De lokale server gaf een fout." };
     return j.text;
   }
   const sample = async (input, opts) => ({ text: await call(input, opts), truncated: false });
