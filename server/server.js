@@ -90,6 +90,10 @@ function findClaude() {
   );
 }
 let CLAUDE_BIN = findClaude();
+if (process.argv.includes("--find-claude")) {
+  if (CLAUDE_BIN) console.log(CLAUDE_BIN);
+  process.exit(CLAUDE_BIN ? 0 : 1);
+}
 
 // Zet een gesprek (rollenspel) om naar één prompt voor de CLI.
 function toPrompt(input) {
