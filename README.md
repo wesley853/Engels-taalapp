@@ -1,6 +1,8 @@
 # Other Biscuit
 
-Zakelijk Engels oefenen voor online marketing. Elke dag 8 minuten, met langere opdrachten als je meer tijd hebt. Je eigen fouten worden je lesstof.
+Engels oefenen in twee sporen: **Werk** (zakelijk Engels voor online marketing) en **Dagelijks Engels** (gesprekken, reizen, series, nieuws). Per spoor een dagelijkse sessie van 8 minuten, plus langere opdrachten, een woordenschattest, woorden uit je eigen teksten en leesstukken. Je eigen fouten worden je lesstof.
+
+De woordenlijst komt uit SUBTLEX-US (Brysbaert & New, 2009): woorden gesorteerd op hoe vaak ze voorkomen in films en series.
 
 ## Installeren (eenmalig, Mac)
 

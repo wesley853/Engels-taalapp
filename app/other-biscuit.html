@@ -87,6 +87,7 @@ main{min-width:0;padding-inline:clamp(16px,4vw,48px);padding-block:32px 64px}
 .btn svg{width:18px;height:18px}
 :focus-visible{outline:3px solid var(--teal);outline-offset:2px}
 .chip{display:inline-flex;align-items:center;gap:6px;font:600 .78rem var(--f-mono);padding:4px 10px;border-radius:999px;background:var(--teal-soft);color:var(--ink);white-space:nowrap}
+.chip svg{width:13px;height:13px;flex:none}
 .chip.amber{background:var(--amber-soft)}
 .chip.red{background:var(--red-soft)}
 .chip.green{background:var(--green-soft)}
@@ -161,6 +162,31 @@ details summary{cursor:pointer;color:var(--teal);font-weight:600;font-size:.92re
 .fbp .wrong{color:var(--red);text-decoration:line-through;text-decoration-thickness:1.5px}
 .fbp .right{color:var(--green);font-weight:700}
 .version{border-left:3px solid var(--teal);padding:4px 0 4px 16px;white-space:pre-wrap}
+.home-head{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.ring.sm{width:112px;height:112px}.ring.sm .lbl b{font-size:1.55rem}
+.sessions{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.session-card{padding:22px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;min-height:230px}
+.session-card::after{content:"";position:absolute;right:-70px;top:-70px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,var(--glow1),transparent 70%);pointer-events:none}
+.session-card.dagelijks::after{background:radial-gradient(circle,var(--glow2),transparent 70%)}
+.plan-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;color:var(--muted);font-size:.94rem}
+.plan-list li{display:flex;gap:9px;align-items:center}
+.plan-list li::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--teal);flex:none}
+.session-card.dagelijks .plan-list li::before{background:var(--amber)}
+.word-en{font-family:var(--f-display);font-size:clamp(2.1rem,5vw,2.9rem);font-weight:800;color:var(--teal);line-height:1.05;letter-spacing:-.02em}
+.word-nl{font-family:var(--f-display);font-size:1.35rem;font-weight:600}
+.testword{font-family:var(--f-display);font-size:clamp(2.4rem,7vw,3.4rem);font-weight:800;text-align:center;padding:36px 10px;letter-spacing:-.02em}
+.yn{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.reading{font-size:1.08rem;line-height:1.75;max-width:68ch}
+.reading p+p{margin-top:12px}
+.reading mark.gl{background:var(--amber-soft);color:inherit;border-radius:4px;padding:0 3px;cursor:pointer;border-bottom:2px dotted var(--amber)}
+.reading mark.gl.sel{background:var(--amber);color:var(--on-amber)}
+.gl-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:8px}
+.gl-item{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--solid);cursor:pointer}
+.gl-item input{margin-top:4px;accent-color:var(--teal)}
+.bandchart{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;height:140px;align-items:end}
+.bandchart div{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;font:500 .72rem var(--f-mono);color:var(--muted)}
+.bandchart i{width:100%;max-width:40px;border-radius:7px 7px 3px 3px;background:linear-gradient(180deg,var(--teal),var(--teal-soft));transition:height .8s}
 .toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:50;background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;box-shadow:var(--shadow);animation:in .3s ease}
 .resume-bar{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-color:var(--amber)}
 .verdict{font-size:.92rem;padding:8px 12px;border-radius:10px;background:var(--line);align-self:flex-start}
@@ -226,7 +252,7 @@ th{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mu
   .side{display:none}
   .mobile-top{display:flex;align-items:center;justify-content:space-between;padding-inline:16px;padding-block:14px 4px;position:relative;z-index:1}
   main{padding-block:12px 110px;padding-inline:16px}
-  .tabbar{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:0;right:0;bottom:0;z-index:20;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));background:var(--surface);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--line)}
+  .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:20;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));background:var(--surface);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--line)}
   .tabbar button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.72rem;font-weight:700;color:var(--muted);padding:6px;cursor:pointer}
   .tabbar button svg{width:22px;height:22px}
   .tabbar button[aria-current="page"]{color:var(--teal)}
@@ -236,6 +262,10 @@ th{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mu
   .kpi{padding:12px}
   .kpi b{font-size:1.3rem}
   .suggest{grid-template-columns:1fr}
+  .sessions,.two{grid-template-columns:1fr}
+  .session-card{min-height:0}
+  .ring.sm{width:88px;height:88px}.ring.sm .lbl b{font-size:1.2rem}.ring.sm .lbl .small{font-size:.7rem}
+  .tabbar button{font-size:.66rem}
   .task-head{grid-template-columns:1fr;gap:16px}
   .task-head .clock{justify-self:center}
   .clock{width:92px;height:92px}
@@ -256,6 +286,7 @@ th{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mu
   <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></symbol>
   <symbol id="i-back" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 5l-7 7 7 7"/></symbol>
   <symbol id="i-spark" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8z"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5M8 7h8M8 11h6"/></symbol>
   <symbol id="i-sound" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 9v6h4l5 4V5L8 9zM16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></symbol>
 </defs></svg>
 
@@ -367,9 +398,59 @@ const LONG_TASKS = [
    steps:[["Bepaal toon en kernboodschap",4],["Schrijf de eerste mail",14],["Schrijf de korte vervolgmail",8],["Vraag feedback",4]]},
   {id:"strategie",mins:45,type:"schrijven",mode:"feedback",title:"Strategievoorstel SEO",
    brief:"Schrijf een SEO-voorstel voor een Engelstalige klant die een webshop in duurzame kleding lanceert: doelen, zoekwoordaanpak, content, technische basis en een planning voor 6 maanden.",
-   steps:[["Maak een opzet met kopjes",8],["Schrijf per onderdeel 1 tot 2 alinea's",25],["Herlees op duidelijkheid en vaste uitdrukkingen",7],["Vraag feedback",5]]}
+   steps:[["Maak een opzet met kopjes",8],["Schrijf per onderdeel 1 tot 2 alinea's",25],["Herlees op duidelijkheid en vaste uitdrukkingen",7],["Vraag feedback",5]]},
+  {id:"hotel",track:"dagelijks",mins:10,type:"spreken",mode:"rollenspel",title:"Rollenspel: probleem in het hotel",
+   brief:"Je kamer is niet wat je geboekt hebt. Claude speelt de receptionist. Los het vriendelijk maar beslist op.",
+   role:"You are Emma, a receptionist at a hotel in Edinburgh. The guest booked a double room with a view but got a small room facing a car park. The hotel is almost full. Be polite and offer small solutions first; offer a better solution if the guest is clear and friendly.",
+   steps:[["Bedenk wat je wilt bereiken",1],["Voer het gesprek, minstens 5 beurten",7],["Vraag feedback",2]]},
+  {id:"restaurant",track:"dagelijks",mins:10,type:"spreken",mode:"rollenspel",title:"Rollenspel: uit eten",
+   brief:"Je bestelt in een restaurant in New York en er gaat iets mis met je eten. Claude speelt de ober.",
+   role:"You are Marco, a waiter in a busy New York restaurant. Take the order, answer questions about the menu, then bring the wrong dish. Handle the complaint in a natural, friendly American way.",
+   steps:[["Bedenk wat je wilt bestellen",1],["Voer het gesprek",7],["Vraag feedback",2]]},
+  {id:"shadow2",track:"dagelijks",mins:10,type:"luisteren",mode:"shadowing",title:"Shadowing: smalltalk",
+   brief:"Laat de tekst voorlezen en spreek mee. Let op hoe woorden in gewone gesprekken in elkaar overlopen.",
+   text:"Hey, how's it going? I haven't seen you in ages! What have you been up to? I've been pretty busy with work, to be honest, but I finally managed to get away for a few days last month. We went to the coast, and the weather was surprisingly good. Anyway, are you coming to Sarah's thing on Saturday? It should be fun.",
+   steps:[["Luister 2 keer zonder mee te praten",2],["Lees mee en spreek zacht mee",3],["Spreek mee zonder naar de tekst te kijken",3],["Dicteer de tekst uit je hoofd en laat Claude vergelijken",2]]},
+  {id:"feestje",track:"dagelijks",mins:15,type:"spreken",mode:"rollenspel",title:"Rollenspel: kletsen op een feestje",
+   brief:"Je staat op een verjaardag en raakt aan de praat met een Brit die je niet kent. Claude speelt die persoon. Houd het gesprek gaande.",
+   role:"You are Jamie, a friendly British person (32) at a birthday party in Amsterdam. You moved to the Netherlands a year ago. Make small talk: ask questions, share bits about yourself, react naturally and use casual everyday English.",
+   steps:[["Bedenk 3 vragen die je kunt stellen",2],["Voer het gesprek, minstens 8 beurten",10],["Vraag feedback",3]]},
+  {id:"debat",track:"dagelijks",mins:20,type:"spreken",mode:"rollenspel",title:"Rollenspel: discussie over AI",
+   brief:"Een vriend vindt dat AI meer kwaad dan goed doet. Claude speelt die vriend. Geef je mening en reageer op zijn argumenten.",
+   role:"You are Sam, a friend of the learner who is sceptical about AI: worried about jobs, fake news and privacy. Argue your point in a friendly but stubborn way, ask for examples, and admit it when the learner makes a good point.",
+   steps:[["Bedenk 2 argumenten",3],["Voer de discussie, minstens 8 beurten",14],["Vraag feedback",3]]},
+  {id:"review",track:"dagelijks",mins:20,type:"schrijven",mode:"feedback",title:"Review van een serie of film",
+   brief:"Schrijf een review van een serie of film die je onlangs hebt gezien, alsof het voor een Engelse website is. Wat werkt goed, wat niet, en voor wie is het?",
+   steps:[["Kies de serie en 3 punten",3],["Schrijf de review (150 tot 200 woorden)",13],["Vraag feedback",4]]},
+  {id:"vakantie",track:"dagelijks",mins:20,type:"schrijven",mode:"feedback",title:"Vakantieverhaal",
+   brief:"Schrijf een mail aan een Engelse vriend over je laatste vakantie: wat je deed, wat er misging en wat je zou aanraden.",
+   steps:[["Bedenk het verhaal",3],["Schrijf de mail (150 tot 200 woorden)",13],["Vraag feedback",4]]},
+  {id:"opinie",track:"dagelijks",mins:30,type:"schrijven",mode:"feedback",title:"Opiniestuk",
+   brief:"Schrijf een kort opiniestuk over iets dat je bezighoudt, zoals thuiswerken, social media of wonen. Gebruik een duidelijke opbouw: stelling, argumenten, conclusie.",
+   steps:[["Kies je stelling en argumenten",5],["Schrijf het stuk (250 tot 300 woorden)",20],["Vraag feedback",5]]}
 ];
 const TYPE_LABEL={schrijven:"Schrijven",spreken:"Spreken",luisteren:"Luisteren",rollenspel:"Rollenspel"};
+const DAILY_TASKS_D=[
+  {type:"spreken",title:"Je weekend",brief:"Vertel wat je afgelopen weekend hebt gedaan en wat het leukste moment was.",len:"4 tot 6 zinnen"},
+  {type:"schrijven",title:"Een serie aanraden",brief:"Een Engelse vriend zoekt een nieuwe serie. Raad er een aan en leg uit waarom, zonder het einde te verklappen.",len:"60 tot 90 woorden"},
+  {type:"spreken",title:"Een Nederlandse traditie",brief:"Leg aan een buitenlandse kennis uit wat Sinterklaas of Koningsdag is.",len:"4 tot 6 zinnen"},
+  {type:"schrijven",title:"Klagen over een bestelling",brief:"Je online bestelling kwam kapot aan. Schrijf een beleefde maar duidelijke klacht aan de webshop.",len:"60 tot 90 woorden"},
+  {type:"spreken",title:"De weg vragen",brief:"Je bent in Londen en zoekt een goed restaurant in de buurt. Vraag een voorbijganger om hulp en bedank hem.",len:"4 tot 5 zinnen"},
+  {type:"schrijven",title:"Je woonplaats",brief:"Beschrijf je woonplaats voor iemand die er nog nooit is geweest. Wat moet je zien en wat kun je overslaan?",len:"70 tot 100 woorden"},
+  {type:"spreken",title:"Je mening over het nieuws",brief:"Kies een nieuwsonderwerp van deze week en geef je mening. Noem één argument voor en één tegen.",len:"5 tot 7 zinnen"},
+  {type:"schrijven",title:"Een weekendje weg plannen",brief:"Stuur een vriend een bericht om samen een weekendje weg te plannen: waar, wanneer en wat jullie gaan doen.",len:"60 tot 90 woorden"},
+  {type:"spreken",title:"Een grappig verhaal",brief:"Vertel over iets grappigs of geks dat je ooit is overkomen.",len:"5 tot 7 zinnen"},
+  {type:"schrijven",title:"Je hobby",brief:"Beschrijf een hobby of sport en waarom je die leuk vindt.",len:"60 tot 90 woorden"},
+  {type:"spreken",title:"Advies geven",brief:"Een vriend twijfelt of hij van baan moet wisselen. Geef hem advies.",len:"4 tot 6 zinnen"},
+  {type:"schrijven",title:"Je lievelingsgerecht",brief:"Leg uit hoe je je lievelingsgerecht maakt, stap voor stap.",len:"70 tot 100 woorden"},
+  {type:"spreken",title:"Een wedstrijd navertellen",brief:"Vertel hoe een sportwedstrijd of evenement ging dat je onlangs zag.",len:"4 tot 6 zinnen"},
+  {type:"schrijven",title:"Droomvakantie",brief:"Beschrijf je droomvakantie: waar, met wie en wat je zou doen.",len:"60 tot 90 woorden"}
+];
+const trackOfTask=t=>t.track||"werk";
+const trackOf=c=>c.track||"werk";
+/* Woordenlijst: 9.000 basiswoorden uit SUBTLEX-US, gesorteerd op hoe vaak ze voorkomen in films en series (Brysbaert & New, 2009) */
+const WORDS="you the that and this for your have know was not can are all with just get here but there they right like out she about him got now one her want think good see did who his will going from when back time look take man them would been some tell had were say could really something down then little way our make too never over more need mean very off sorry give has love said people please sure any thing only because two should doing much sir help anything these even night call talk nothing into first find wait put great thought day work life before better again still home guy won those than around other away new last ever stop keep told must big after long does always their everything nice name money feel believe old place fine kind lot years made leave girl hear father through every bad remember three boy coming wrong might stay house may baby another enough happened show course being care done mind left ask car understand mother which try hell came own world guess next kill else dead someone real room morning hold woman yourself today friend move same job tonight went son best saw found pretty ready heard whole seen together minute men head matter knew many idea without play family meet most run while wife once live somebody everybody used use myself took yet start kid tomorrow happy school problem watch bring actually business hope open already since sit cause alone hard stuff turn until few honey gone both door later such face worry ago five second brother case probably beautiful hand check year forget hit lost crazy late phone end easy doctor under part deal die soon four anyone pay happen true each supposed eat mine town afraid drink exactly whatever hurt heart gave young everyone chance read number change week anyway married point police word fun wish bit game party set cut comes sleep shot anybody stand water trouble dear couple eyes break story far close funny goes lady death walk fire hours hate gun rest person inside different least important also line office dinner quite against fight side six half pick question ahead cool women body high husband reason almost dog buy truth met hot anymore behind speak bed moment tried blood shall stupid along either though front sister send welcome sometimes trust free book answer between children war fact brought bet clear its white glad daughter outside city black seems full till sick light shoot lose wonderful months save hour country able perfect child died order sounds alive food gentlemen luck hair drive promise sex music power sort special serious street red dance hang touch team company pull plan sweet ten coffee lucky sound safe date parents himself seem air taken picture sent fast catch ride win top scared dream sign sense beat control drop cold darling figure king poor throw write cannot suppose small human piece boss hospital past known follow movie straight weren clean kiss feet million lie felt certainly step learn fall finally class quiet wonder law become rather possible unless mad absolutely tired murder road eye except somewhere explain less none secret wear worth act careful quick handle pass early report state busy table wake broke ball seven mouth marry meant fault lunch expect future paper hotel buddy blue mistake wedding clothes weird court floor building earth dude finish forgot ship club attention eight worse pain sing blow choice birthday stick relax yesterday honor smart boat plane month given train fair security cover across bag terrible caught song spend horse ring sell return personal message system afternoon tough quit count box missed present charge kept information fool simple middle calm surprise forever decided dark anywhere miles swear land missing cute lying master dress key strong fix interesting strange voice rock cop window bar totally interested appreciate army paid short record bought card certain college fly evidence bank completely ran test history born proud fish join lead smell near apartment enjoy letter situation trip store amazing star accident imagine pleasure ought list rich service entire difference judge ice lawyer fat instead age station realize gold seat hundred summer dollars mess radio hungry marriage brain soul forgive drunk deep girlfriend folks slow private during attack beer definitely partner area dangerous scene third upset bus owe shoes group kick evil joke fell truck teach ground green cash honest forward boyfriend park position single respect broken crime wrote public grab art favor upstairs wall force jail push prove normal machine protect field spent jump nose hide church sun peace share thousand fear using tape suit involved gas relationship neither nine rules especially nervous whether dying stuck round dirty cat breakfast idiot space prison carry cry smoke arm film government tree foot contact knock agree pardon gift hat sweetheart sake board department patient awful sad roll beginning grand usually laugh listening doubt upon double twice whose outta plenty guilty race chicken bathroom spot weekend action glass type experience obviously wine press difficult rid sea flight arrest neck grow mention favorite wind notice admit extra within low impossible gay computer angry bunch blame pants visit clock tea fellow kitchen lay hole guard smile fit pal bear often wild silly camera begin reach beach heaven lock leg worst bucks suddenly track ridiculous river dare burn raise decision cross cost queen innocent fresh emergency medical cell gotten bomb note sweetie shop nuts band price steal waste client stole code pressure accept further excellent magic corner consider ourselves herself address copy warm sold pregnant hall treat everywhere complete cup level witness taste camp beg duty interest tight bottle support decide moon bottom conversation hero asleep final continue match trial apologize spirit chair risk study possibly rain above cousin cream excited memory breathe enemy huge search drugs beauty rule build choose advice immediately teeth became victim coach flowers crew heavy trick empty comfortable destroy mission apart pool dumb knife weapon restaurant shirt faith simply dig size necessary themselves blind credit center bridge practice discuss mister ticket cook strike stage animal bird sight somehow drug nature responsible cake famous nurse correct breath allowed sky account due common afford tie bright belong allow concerned escape suspect written file skin madam fill operation desk taught pack lied deserve danger meat command whoever beyond student dry jury form main program milk held horrible kinda feed natural battle ugly coat settle opinion terrific gentleman loose local lonely shame large devil video speed military built oil opportunity chest threw bite wash stone block indeed invited draw attorney pretend health heat manager guest loud itself fantastic shake lab princess island color bell naked suggest wet pig letting nowhere cheese downstairs soldier monster several planet insane fellas eggs spoke butt view bloody insurance split jealous bullet arrived character national screaming speech airport hook condition target serve incredible sugar signal total hill football page screw justice rough project crowd pair science usual subject strength remind mail paint freak bedroom onto neighborhood finger spell ghost fake release weight market cheap pray unit throat lake nor director truly brilliant cab prepared candy legal pocket aware roof babe slept responsibility mountain base firm whom trade romantic liar fan powerful language whenever purpose bless noise suck fancy exciting genius introduce forgotten rent familiar criminal proof vote recognize stolen com suicide weather medicine issue lift buried mood male among television regular someday stomach yellow ate scare village prepare monkey pizza assume toast sudden fella ears jacket social travel sometime property secretary remain magazine sexual funeral jerk freedom research damage add repeat handsome hired society prefer energy crack chase vacation divorce defense rat began goodness post confused telephone surgery contract safety tall professional lesson tiny assistant understood model license gate soft staff ear warning engine map swim harm square silver brave access positive female someplace blew weak season rush awesome snow spring champagne spread mayor pounds demon lips tongue permission bath storm spare tour bones appointment score shoe ocean reality shape survive gang cos style farm sexy example laid gosh alarm schedule fortune bleeding enter punch invite obvious interview affair wherever unbelievable focus chocolate borrow grade grew investigation statement mate load community loss barely woods details yourselves exist toilet meal drove dump disappeared shock member discovered failed pie crash artist theory sat depends joy ruin traffic pink nonsense wise midnight deliver bread button original source hung received switch charming decent below process desert expensive particular grandmother period pride witch dollar tip plant sports bust birth joint including bull wire rise towards boring ashamed section clever success garage physical connection complicated regret closet wheel giant policy wood tear fate juice governor tied awake fought coast pilot miracle aboard disgusting cigarette grateful mighty garden wound fourth drag scream event woke row actor grave senior flat curious winter super scary priest disease sword chick concern talent garbage attitude bone egg recently engaged quarter basically thee swing available knees slip bike hunt taxi stood object percent dirt desperate plate negative tank distance data request hire knowledge golf dawn cow stock equipment conference rescue sale claim audience silence warn mercy proper universe create baseball soup outfit yard grown rate pure bro celebrate piano pills uniform duck doll location amount healthy pen attractive fail beast poison path happiness anytime eventually elevator channel thy belt secure grandfather penny avoid thief bride pathetic mirror dozen direction gorgeous odd direct theater march led committed official effect tail vision trap dust wide honour sharp aside stairs deck guts extremely lousy unusual newspaper courage apple terribly pulse illegal edge pity protection couch screen appear precious studio rob golden frightened royal intend cast popular destiny robbery federal silent violence nerve mystery circumstances library toward tower photo practically embarrassing maid shift friendship wallet package range flower steady results rope image exact vehicle turkey easily jungle nasty sensitive pot suffer trash thou ambulance prize nightmare behavior per snake cancer orange terms foreign media material expert rude flesh advantage disappointed guarantee committee punk downtown sandwich marks political sweat panic cents performance plain boom union cable fruit separate underwear ancient castle delicious value circle glory squad bills miserable manage zero victory bowl embarrassed creature basketball deny mixed route rare yelling holiday hidden ill remove wave progress gods chain authority emotional wore shadow gray estate skip horn agents basement pleasant mile refuse approach disappear district rabbit bug champion competition proceed presence cure century capable swell convinced warrant threat therefore bury shine diamond bat chip alert transfer thrown sentence fabulous nation booth casino successful sand possibility bow cage wolf desire wing exchange bored thin pet rip series drama homework zone explanation spy failure assure collect bang print launch useless fever journey delivery sport loan challenge soda routine spoken trunk mask purse result passion argue climb beef recall cabin mental script article solid education salt solve confidence receive metal frankly anger agency detail pipe trace supper spit effort hug treatment commit troops reputation intelligence custody site ability fifth trail palace boots hop mouse attempt bout ease ordinary treasure impressed customers laundry revenge cowboy nuclear motion mall virus virgin scratch fifty potential defend contest plastic fashion cap interrupt convince cheer arrive supply surveillance chose nail ignore league vice favour coincidence cheating title quality division impression reasonable tiger therapy museum minister steel bound standard slave yell anniversary shy cruel seek cancel prime socks smooth surface modern curse role lifetime chosen eaten motel gym collection device pee heck noon reward lets degrees iron express sacrifice cookies tunnel assignment highway insist guide slide wrap specific wagon prom lack defendant exercise cheat kit background clue assault concert ranch temple designed vampire foolish agreement tent flag darkness rotten term alien patch provide snap bail imagination actual incident liquor disaster connected fully mass comfort sec border fuel legend electric opera demand circus current trauma salad neighbors argument describe starving impressive neighbor fallen sink council backup wipe trigger sneak tone toy youth crush factory grass campaign instance goal cookie generous fairy violent liberty suite crisis average humor stake nephew gambling politics alcohol threatened occasion gentle network unhappy charity explosion confession offense judgment headquarters shout filthy tube surgeon hon kidnapped operator math personnel pin mix alley reaction chat depressed commercial underneath mon gloves version behave steak chill fantasy honeymoon design experiment struck blast identify classic arranged crystal procedure whiskey response perform dope fence poker powder actress gear rape advance suspicious sin civil torture blown personality selfish dough fed confess clown tries ceremony solution helicopter apology forth invented entrance strip gather uncomfortable concentrate satellite deputy instructions nut daily tune stress merely sauce valuable guitar sighs basic belly exit charm net romance pitch patrol arrange satisfied makeup surrender whistle rub bum kingdom wives hip hood flew diet patience junk earn lion flash frozen homicide gross badge financial opposite soap customer beside unknown privacy painful represent anyhow pour extraordinary champ twins squeeze meantime fascinating furniture rice bend host mysterious sore shark balance technology angle guilt invitation degree aim urgent movement mud review influence moron testimony tap seal product broad skull status escort knee stretch territory listened spin favourite relief sample angels noble skills rifle hostage tax port deaf technically literally pattern habit foul occurred beans option confirm lad coward brief benefit awkward adult flip ward counsel gal corn international debt testify cotton roses shown facility tragedy childhood pro towel brush admire self lightning jet costume bush prick frame respond headache anxious flies attend sacred dessert afterwards clinic recommend thick remote cave skinny brand polite culture theme blonde darn aid conscience pound oxygen tag religious religion combat construction audition laughter commission temperature shave dame principal sail drill flow gain crown tradition wreck granted species zoo poem unique tennis similar chop muscle barn leather cherry tooth emperor jam moral intelligent lap blah steam sheep adventure punishment exam penis gum suitcase struggle poetry equal operate replace citizen freezing possession thunder abandoned halfway wicked session surrounded paradise palm motive shove shell cattle magnificent pit hut stable stink basket pile sire marvelous musical whip determined motor missile parent monitor useful recent complex incredibly organization stroke backwards prevent accused engagement chuckles goose rap temporary limit appeal despite blade superior propose blanket cried eleven identity maintain mob inches delighted cigar sack clerk award activity scout parade lamp profile resist appropriate drank exhausted comment mistaken hatch minor dive environment medication beloved expression manners chamber task swallow capital tub lobby chin toe empire string developed production nap description pump con inform beard related twist typical bid pole realise remarkable soccer entertainment complain insult apply producer hammer sheets slap neat rehearsal railroad rear breasts battery editor diner toss sailor inch tire invisible lawn peanut bump convention phase purple revolution fond excitement item thus episode passengers pan thirsty cruise coma tend development critical tragic handy attached graduate suggestion signature dismissed advise robot accent scientist labor behalf entry discussion generation permanent servant helpful captured assigned brass permit terrorist kidnapping widow dull retired dime psychiatrist crawl vault discover lemon underground loyal bargain tale precisely combination beaten employees log tattoo basis link jazz needle mistress chef psychic attracted dishes bacon sunshine chapter unfortunate rocket thumb frog pill comedy weed threatening cloud undercover policeman pops dining industry fries picnic hid reckon existence individual loyalty workers splendid shelter lend carpet management divine spoil beneath porn sheet lazy plot appearance ham employee betrayed medal waitress hockey destruction entitled fingerprints visual active dish electricity discovery puppy perfume unconscious theatre temper roommate pillow scientific defeat approve elephant alike chemical photograph heal shrink practical serial rage absolute potato applause slightly necessarily gin whale peaceful warden creep dentist immediate transport gig straighten reception helpless boot affect billion include creepy luggage tools brandy annoying disturb nest conduct function wisdom massage thrilled jewelry produce analysis delay psycho register election shed reverse intention column lick profit fetch extreme verdict booze emotions assistance lame promotion bra airplane rhythm everyday cocktail stubborn von torn pumpkin clothing concept comic grief deposit sixth dignity commitment instant passenger salary creative lip throughout strictly tool tissue banana eternal marked rod required campus subway confident homeless paranoid barrel wizard drawn privilege require lamb fund executive traitor multiple lungs drown statue capture fleet consequences payment exposed begun measure compared adorable pork goat candles collar effective root injured lecture publicity passport blond dice parole twin salesman rumor rug nanny plug paperwork tellin unlike rode lean communication cooperate bee wrist worthy misery punished reservation conspiracy obsessed sunset enormous curtain announcement jeep driven specifically relieved locate compliment ballet stiff sum naughty unable abuse tense burger album random corporate happily injury intense impress gunshot brick priority organized slight raw structure complaint fried leak worm warrior survival dynamite vodka sober document spider bleed corpse glove worn branch pistol budget relatives envelope novel shotgun fraud bucket overnight heels application warehouse stare menu skirt butler massive acid scholarship constant visitors counselor festival scum centre depend examine oath bachelor celebration pencil ashes bounce confusing fridge internal arrangements unfair core burden heroin championship dummy graduation humble silk dramatic retire roast observe explode announce bartender ransom seventh gut coin necklace execution dock investment lit bait bald blank humanity absurd kidney fee grip sworn atmosphere punish ape polish bench spray connect pancakes porch floating develop autopsy mortal pace burnt quote terrified daylight envy relations hallway niece interfere mill smack delicate therapist sweep lesbian scale retreat previous chart cent investigate helmet awhile stabbed fog succeed aircraft strategy physics farewell arrangement scan severe tons impact chaos triple civilian maniac cellar flush independent vessel reveal alternative motherfucking height deed volunteer glorious upside debate error faint worthless telegram whatsoever web resources poet gasps amusing bonus hint delightful stunt horror betray snack conclusion popcorn faithful somewhat penalty tournament thieves recovery magical phrase population chew discipline takin coffin profession wax perimeter cart flame kindness ultimate gently barking cargo terror diary swamp certificate sock coroner associate breast stall broadcast hopeless gamble appetite various fluid obey ritual hostile barbecue technique motorcycle dug whack auction contrary weakness oven spiritual journal dial storage embarrass repair reunion fork pepper accidentally lipstick protest proposal unexpected recovered cough mankind hurricane goddess stab swore infection wrestling visitor cease beam colour flu shrimp deer cannon primary conflict cemetery balloon chemistry excuses harmless fame throne tin electrical fold pimp setup rig drain morgue distant tan vicious briefcase symbol petty vulnerable sleepy convenient tension raid hack solo forbid increase slice display threaten transmission curiosity burst butcher wee candidate gallery communicate invasion laser til lunatic robe rank scar limo spill compete kiddo reference regarding drum retirement madness tremendous disappoint nickel resistance affection dizzy software adopted anonymous thrill haircut inn sequence instincts approval fry determine horny refrigerator courtroom wig compare alibi ceiling sympathy ribs cabinet bare cane indicate nearby doorbell civilization jar generally plague formal emotion tore tramp arrival philosophy misunderstanding infected prior fur footage native depth smash cocaine phony residence illusion qualified lung technical convicted fortunate mature radiation yacht perspective sang shield genuine lan dedicated autograph traditional cocksucker pad presume minimum established doomed courtesy panties scandal capacity allergic abandon improve ski instrument consciousness whispering pony messenger hose versus mole breeze rash tray stream identification devoted recover candle defence worship surgical pale ankle disgrace exception dreadful manual bubble tuna pod symptoms rainbow eternity grandson password cooperation chapel dip tricky tuck depression martini sickness forgiveness author aggressive popped businessman skill wandering whisper proposition hustle method welfare mere formula minus lounge prosecution ditch sis arrow accurate attic assist forehead saddle groom apologise flattered exclusive shiny thoughtful disguise bracelet gossip relative sausage soil cue embassy hamburger rack institution maximum vital aspirin liquid addition bore principle gratitude adore rot blackmail risky expenses corporation shaft auto sunny insanity importance passage instinct magician sub inspired groans terminal zip content pickup unto belief spoon recipe exhibit spite administration stove forbidden karate declare embrace seed genetic bold react violation prep bass prostitute peculiar trophy offended accomplished legitimate hunch umbrella ton ego jolly ink chili protocol rum carriage executed mobile float expense observation outstanding approximately potion chess aisle consent haunted concrete receipt racket advertising occur gesture dealt anchor income distracted heel logical prescription monk guidance wealthy regard freshman pirate tide brutal fist owed ideal achieve precinct puzzle lobster resident refer suspended balcony casualties casual suspicion melt misses breakdown agenda panel bizarre celebrity armor draft illness distress tick elected organ salute scheme jewels factor liable abortion dorm backyard jewel honorable mutual platoon presentation honesty bully bent rally scrambled notify published annual wooden integrity demonstration reserve prosecutor rely bounty savage cheek folk gracious ants substance amongst disorder occasionally jaw fuss calendar jelly confusion weigh carnival medium harsh submarine inspiration hysterical fatal meters strain ridge haul bam compound sector herd gag expose nowadays pursuit objective sentimental length mule congratulate narrow cord compromise strict sting guardian lonesome fax plead tobacco automatic cries grunts intimate satisfaction nun shelf stud moonlight household hobby tolerate grease volume subtle semester geek knives opposed myth elements resort pervert fountain crab razor gravity teenager bolt pledge domestic label slick clearance chow clamp dispatch eighth messy sorrow electronic teenage eager plea shovel bean mug maintenance hardware attraction coordinates conscious jackass sensible pose sophisticated nickname colleague loop anxiety classified theft med lottery psych obligation psychological driveway sponge online negotiate logic rabbi confidential feast preacher detectives lodge baked scissors possessed leap circuit bonds brakes humiliated dreamt galaxy urge enforcement proven dot feather disagree disk endless greedy inappropriate element vegetables memo jeans rejected mattress democracy melody frequency withdraw bicycle innocence notion mice coal internet starboard needn consideration pregnancy gown pier amateur salmon ninth siren architect registration survivors hike detention gasoline urine vain beep morphine pronounce rehab kidnap vows laboratory explosives forgiven riot significant airline wardrobe granddaughter involve choke naive growth mustard cheerleader mansion ram stew fart altogether whereabouts drift pursue ginger click discharge quest extend offensive tech customs psychotic torpedo literature persuade canal regulations initial hereby purchase tribe hay earthquake frighten bein intact chap convict depressing peach cereal wealth surf breed establish outrageous bake pond companion underwater tasty footsteps hairy absence shipment settlement global prophecy deceased spark bunk velvet lease syndrome elegant ignorant compassion puke scenario bourbon authorized deliberately define baggage overtime straw scrub sperm coverage retarded bluff cavalry erase explore ashore brat breach replacement unnecessary pine crib alcoholic stain bedtime overcome custom wheelchair est civilized elsewhere drunken distinguished dental accountant pudding definite engage fare starve booty essay acknowledge scam platform earrings physician entertain elbow stadium den ironic pinch rendezvous yen heavily journalist unpleasant cloth stack vast lawsuit investigator bathtub ketchup fiction invention contain isolated chorus creation noodles comb protective antique sunrise dash bribe encourage musician ahold luxury passionate exotic voyage garlic furious sincere brake steer eliminate supervisor compartment stereo shade scent conviction boil shook peak parlor assassin flashlight stamp wit spaghetti colony slack wolves holler reliable mortgage shallow pigeon handwriting groceries nude skate rib lighten stir tomato cycle humiliating modest additional destination inspection biological glue ammunition harassment sloppy probation tequila universal deadline despair sofa wander battalion documentary poke divide accomplish recognise feature housekeeper fuzzy sour pajamas muffin slam martial queer troop vet economy definition hilarious neighbourhood obliged tow streak disco vacuum classy cheque tab variety jealousy dam consistent resent wheat spine orphan occupied glow suing facial sticky janitor bodyguard naval vegetable automobile medic era millionaire exposure cuff handful flood crooked generator tease database toad clip accuse resume attract crook lethal cafeteria obsession onions craft scoop spectacular expedition intel collapsed interrogation orbit respectable delight inevitable cozy shack tomb suction fireworks adjust farther chauffeur preserve essence doom intent relevant promoted satisfy evacuate owl fade sleeve quarrel scope oak rubbish felony poop difficulty consult quantum knots presidential homecoming heartbeat corridor dove encounter vest audio relieve lust foreman misunderstood rodeo gorilla vanished execute collapse transportation freeway grid maiden submit veins strawberry burglar moose educated loosen identical shuttle ghetto concentration scumbag sane examination butterfly lemonade assassination bloom tactical prey orchestra confirmation grocery bark sew possess artillery weep warp slot unlock dismiss sidewalk runway barber puppet ancestors psychology squirrel listens hesitate waltz defensive slaughter hee mint portrait politicians disappointment anyplace ambush rang leopard vengeance hatred tourists vow popping departure clumsy pause perfection extension behaviour digital bin thankful ammo mock hideous tango employer finance ambition offence acquaintance ferry ethics ant orphanage donkey sponsor rebel peel addict employment graveyard blouse peek landlord gangster kneel crank specialty stray evolution vomit choir flirting unacceptable explosive topic corrupt artery jurisdiction marijuana partnership appointed cottage dose spice representative diapers gravy humour madman impulse acceptable historical stalking pearls bruises sole denial greet kung expectations lone interior text tribute marker carbon disrespect que goofy heir vibe offend globe gunfire arrogant marble dont repay allowance junkie precise leaf boogie videotape fugitive specialist fracture untie tumor rep condom thread hunk banquet override trousers valet virtue strap primitive handcuffs slippers freezer mode caution sensors irrelevant sobbing regardless saloon waist fragile panicked narcotics backstage juvenile majority appreciation detect hog drip francs skeleton amazed allies assets sip transplant syrup publish unstable immortal playground motto treason funky lyrics premises altar grunting fireplace amigo overboard blink vagina underestimate mechanic ads dried cafe recommendation jingle ribbon utter flick payroll resign stash hound buckle noisy pneumonia rational diplomatic region salvation contempt justify reflection cocoa camel reconsider legacy freaky supermarket abducted flavor frustrated loneliness toothbrush stitches paramedics conquer plasma torch static restore slug visible efficient crappy par ensure economic quiz hath sketch rookie chronic mustache update lifestyle careless artistic overwhelming dagger humming reckless licence lid abroad weasel disposal childish mechanical blunt strangled adjourned biology toxic atomic consulate heap involvement cetera leadership selected edition distract numb axe sensation fuse crop faculty separation meaningless sued reduced verify essential resolve lizard valve plumbing partial hunters decade embarrassment pension suitable regiment restless jockey uptown artificial hum racist seize translate rental assembly fabric convenience moaning tickle mild greed merchandise chuckling sadness pussycat whining alter grim comrades fierce rag homeland preliminary pageant sufficient discount broom confuse dim thoroughly grain estimate swept ambitious quarterback voodoo vanquish psychiatric violin specimen elaborate elementary moms accompany burial relate venture kitten spooky clap onboard tactics invest yearbook homosexual thorough opponent instructor souvenir raft sought adoption treaty scarf translation spa bloke limb instructed inventory humiliation realm demonstrate academic adopt substitute activate tad verse lens urban triumph flock nightclub peas sunk irresponsible interference supportive tourist babysitter dimension sunlight snuck flank solar quack decency ungrateful curve realistic pickle commence midget grenade athlete unload notebook invent programme tutor asylum heroic phenomenon salon intellectual cement acres schmuck coconut crucial curfew flee grasp recognition overseas sneakers rail feminine violated spies irony industrial temporarily intern microphone selection spear flown condemned nipples doughnuts acquainted considerable communists filth riddle vague hospitality penthouse authentic despise porno growling installed boost rehearse expelled protein plumber concussion enthusiasm loaf marathon horizon yummy keen acquired grill lookout cherish puff classroom werewolf yoga survey origin warmth cult quarantine guinea crow swine claws sweaty buffet inconvenience peep barracks grudge vile blackout probe evaluation piggy rhyme advisor doggy supernatural hump promote courthouse endure slippery vent fled dandy remark parallel villa radius revolutionary classical participate squadron undo scrap squash strangle claw contribution rapid sushi sniper imaginary portal suspension marvellous immune antidote fisherman poverty portion survivor pawn posse buzzing rays shutting disappearance website collector gasping organize truce chilly organic ballroom sanctuary oral doo millennium leash reduce juicy drugstore mold superintendent tackle dine diagnosis spinal radical blend paycheck corruption iced gap confront turf kin triangle trim diaper melon introduction equipped seminar terrifying lure visa pasta canvas accomplice onion sneaky betrayal temptation immunity forged stepmother froze reject inherited intercept infant apparent hull airborne magnetic neutral petition shampoo condo flare doughnut splash chanting devastated shattered headlines ops grandparents chores competitive handkerchief orgasm spontaneous dork tailor chimney reflect humiliate itch greatness exquisite automatically ripe profound informant mailbox rye brotherhood priceless groove ignition villain tenth batch weary chunk injection postcard devotion sonar smelly stroll bandits combined ruthless mop salvage unlucky vanity trumpet crippled pry scrape morale establishment retrieve fingernails occupation relation cocky crate givin employed elderly virtually secondary chump clan destined void giggling curb teen comedian stunning qualify restricted terrorism donor blackjack alias rom dialogue hitch insecure cunning category complications exhibition nursery yum compass slavery panting extent discreet runaway tuition generals impatient worthwhile ounce preparation uptight yield trout peasant transmitter legendary roar sensational token objections whisky portable ratings reef pyramid grape reactor dunno goddam errand prank overheard jinx northwest independence donate nod tempted stumbled liberal predict expertise dinosaur formation vanilla dumpster hoo alleged massacre vegetarian cultural apiece eyewitness aces wager astronaut cardiac corny wrench pancake merger ale excused bladder dolphins mutt overwhelmed wilderness fiance semen disturbance outcome shortcut understandable rascal bled sunglasses buzzer bulb flirt erotic clam dislike righteous bookstore forensic royalty distraction occasional microwave hometown awaits wrath snatch fulfill hangover addiction greasy virginity pea bundle whiz experimental postpone carrots inspire idiotic cinema grandchildren altitude improvement photography rudder metaphor barge wages summon policemen athletic missus carved unarmed rooster beacon swift dye asthma inmates hazard aspect sabotage thrust vase getaway thighs pitiful freight fury operational neighbours kindergarten carrot tonic harvest payback neighbour caviar journalism crusade rainy cripple slit contribute sympathetic unreasonable incompetent thanked moustache groovy buns daytime oysters scenery rival intercourse autumn asset elf alongside conservative awaiting shan surrounding critic percentage pact powerless cartoon amusement agony resignation arse insensitive veteran paddle non thigh macho bandit serum dictionary showtime grind pub menace scattered tractor fasten thirst lent stockings paralyzed rogue cheerful seizure obtain cathedral mechanism gigantic mink tidy premiere boundaries stunned homo practise extensive info notorious lace morality stalker premonition monastery overreacting brunch amnesia hostess ust jackpot judgement manifest mashed groaning pilgrim bitten arch hormones prop scalp footprints recruit spaceship bikini knot gallons refreshing unidentified discretion limp machinery comparison overhead continent antibiotics consultant plaintiff cynical currency intruder consolation betcha intervention redhead scholar unemployed backpack loft swap circulation warlock fiddle wretched coyote arena abduction stuffy fudge historic consul blossom mini reform milord authorization napkin cosmic zombie gator ignorance pupils chute numerous aged pointless bowel chalk lasagna mutant referee bulletin howling psychologist vein cinch canoe decoy burglary substantial bypass stinky pegged haunt nutty slob starters loot underworld vitamins lump symphony veal inherit neglected convoy zoom mist admission goody sniff await indication saints peck alternate wink masterpiece select climate housewife perception dent reschedule via fling meteor beads countdown hash resemblance aft countryside declaration ledge scram crunch unfinished brag foam bakery donation hasty hotshot revoir disregard heartless eccentric obnoxious stool sap elves recess mentor heavyweight por equation alligator thug significance inquiry mitzvah fascinated genie achievement sung prospect expand infinite mat brunette yonder layout polo merciful pep tummy secrecy commerce analyst disabled miners premature manipulate womb laptop schoolteacher seduce lava meaningful tux knuckles cadet karma soak wrestle obscene triad annoyed superstitious unpredictable pharmacy breakthrough southwest intuition titties considerate glance lords midst superstar saline keg mourning jeopardy cockroach epidemic manor negotiations sundown pending precaution abdominal fin plum dum solitary bygones thesis enlisted deceive sigh jacks hangar lettuce savior merit dedication roam collateral barrier terrace spank incapable optimistic resurrection fortress reindeer rebuild rattle doorstep glimpse homey jab shithead bind employ crummy cautious tit abdomen toll fraternity undoubtedly restraining cranky generosity wallpaper initiate notch summit volcano poisonous comeback righty karaoke superhero convent contagious knockout assumption plantation giggles inclined shalt doggie shaken eligible flea prototype evacuation spicy oatmeal download misunderstand lime sync bandages rejection nerd demo courier adrenaline eyebrows seldom southeast immature sleigh sweetness frequently pint probable frontier vulgar goodwill intimacy cashier educational luncheon windshield fundamental biscuits telegraph environmental cupcake statistics politician verge parrot gallant bash credentials hypocrite ashtray diabetes lotion reel crust macaroni operative skunk convertible cope labour institute cruelty detector battlefield nip swollen membership warhead slate unpack maple irresistible bruise investors analyze wedded braces valid bouquet northeast wacky overall pup ratio nuisance doorway sultan cockpit reset whichever brigade anatomy foreigners colorful prejudice stallion assemble province radioactive credibility vanish injustice hen cheeseburger stupidity fingerprint context tropical witty lever filter inheritance learnt majors condolences sardines conceived rapist parachute architecture weirdo brute transit sentiment casket doorman ecstasy quid evolved wool funk typewriter insect reinforcements stewardess acceptance snitch scalpel courageous worldwide flour raving captains dickhead crisp mermaid cologne dispute dispose ban contractor pupil unemployment deception outrage tar mem toothpaste consequence squat gospel heist duct touchy frat bliss samurai allegiance racial paw slimy bosom wimp convert sculpture glamour disconnected regional girlie backward propaganda phoney debris transition wage reign taco defy tavern berries consumed carve assessment isolation babbling sexuality nauseous adjustment motivated forfeit liability attendant closure reaper patron tuxedo tying jumpy diversion lighthouse distribution muffled wand cellphone comet twinkle counterfeit dwarf trench chum fiber twilight bagel hardcore kilometers wailing surround snooping inferior oyster invade excess mathematics bacteria brig opposition honking distinct philosopher conductor handshake flaw conventional tenant goldfish criticism preposterous firearms bonding infrared trespassing needy crude avenge baloney mainland parish upright predictable particles invincible thanking certainty remorse desperation germs tempting unite fiancee belongings demonic temp smuggling recite mellow housekeeping chimp der muddy boob satisfactory vicinity stranded arson accidental accusations deposition turtles cloak scoundrel decline cinnamon hopeful cube fearless frustration drapes relay kinky input wiggle scoot cavity internship rake shrine mojo imported elite veil stepfather glamorous calf vocal shaky confined marrow standby arise medieval cuckoo motivation recital sneeze shred shuffle slope telescope caffeine warfare extract pierced underpants infirmary acute snappy fellowship gents precision distinction depot transaction resolution jewellery rotation canary breakup irrational sled damp outlaw protector clinical stale vintage catalog linen sorta verbal accustomed fireman cone rumour puss platter recon eyeballs exceptional latrine popularity grad cabbage donuts mare covert noodle spotlight sensitivity abnormal superficial overlook memorize overdue underway cactus suicidal puck terminated penguin implying isolate ramp bun malfunction imbecile thine necessity cutie snoring mailman superb genes jeopardize accessory bravery indulge librarian homemade penetrate mil fumes cappuccino pest neon transmit deuce tighten withdrawal cork bandage merchant sophomore geisha sarcasm manhood thingy cradle pronto impose starship poodle cellular mushrooms deliberate caddy lowa penitentiary drone mystical nosy tox demolition eclipse prosecute jumbo infantry decorated constable nipple lineup weenie arrogance brownies slayer slipstream paragraph cricket lingerie limousine maneuver quadrant growls insight bronze mush bollocks prairie fishy clause cramp comm gender accusation stat workshop viewers fiend unlimited bankrupt aggression kettle determination delusional refill dwell rebound psychopath bong stealth creator respiratory creaking vineyard dairy velocity enthusiastic workout hoops disgust vertical dolphin wacko threshold idle slime squid suspend aquarium implants idol enchanted herbs fright turd refund insert revolver orb rewrite spook sideways terminate revelation frequent manslaughter cheerleading followers diagnosed initiative steward squirt slumber witchcraft liters residue magnet unnatural tug crotch shelves feedback atom psyche hippie handicap sanity grub torment liaison hostility imitation efficiency devastating proportion rumble commentator grieving ethical functional allergies caliber sermon leverage tame delusion troll unity catering compelled whirring casualty decorations departed install certified grin misplaced assign presidents traumatic babysitting cardboard furnace tendency anal abide bogus collision impulsive opposing navigator manuscript kosher inmate dignified hoop tofu mingle intimidated casa imply sidekick poetic sinners junkyard olives trembling overdose bleep misfortune legit hydrogen pornography neurotic lass scorpion flexible blush contestant tyres vitamin apron module stomp squeal sustain convey sly harassing paranoia matrimony cognac overrated deploy saliva fragments fore polar attendance etc shush icy roach acquire wireless epi flap diesel delirious vacant classmates adapt anticipated awe harp windy plaster regain predator insignificant jug molecular handbag orchids equivalent blueprints excellence subconscious peed shortage tacky reborn dilemma harness appendix ingredient coup bridal virtual satin screenplay hoot patio spades patriot mend immoral admirable fusion amuse cheesy hassle sarcastic domain obstacle persistent martyr dunk gram descent lug mounted alimony strategic meatball waffles morbid perish molecules counsellor dyke reap holdup debut shuts dishonest designated technician sobs adequate headline obscure mineral ninja obligated sprung echoing blueberry absent ulcer spectacle jogging disc spleen restraint extortion milady freshen senseless aging upstate pepperoni juror cubicle dungeon inspect rebellion offspring tolerance sedative tangled ups maze everlasting tornado screeching contaminated intriguing prominent bulletproof spinach interpretation uncovered capsule fender pineapple steroids coordinate bookie crumbs literary diploma gaze tenderness heritage anticipate sway conceal chateau intrude unbearable mourn rave archives microscope nonetheless ref tempt booby colon leisure qualifications mambo irregular aerial payday cling sovereign immigration newborn screwdriver clone stressful reluctant brew bathe zebra synthetic annoy lovebirds drastic miniature packet agitated foreplay shaman endangered extinct teeny expired dread felon theatrical postman salty precedent harbour tor clutch intrusion landscape sordid whimpering improvise composer alphabet intensity elevated mute representation buggy ache snoop provoke buff whiff cupboard timber unreal villagers premier slogan brink leftovers anticipation knack poll refresh gurney conclude drooling imperative rust sphere indictment gem supervision unicorn mutiny mixture external vouch sodium regulation imperial businessmen hairdresser indoors patent apocalypse insured occupy beggar detained assassinated watchman encore bozo mandatory grapefruit frustrating roulette lumber defect attach parasite suture catastrophe downhill extraction ultrasound testicles restroom profitable bred maternity rendered horrid runt horribly presidency startled refuge rim hypothetical awaken bridesmaid masculine undone stump exploit stoop penicillin finale combo fascist wed enhance unimportant takeoff caretaker hind zap steep knob interpret lunchtime competent orientation curry workplace excessive generate undress dedicate manufacture polka differ scatter homeboy compensate tyre ora gadget icebox composition honourable inject latte imminent repent jog florist platinum homesick uphold hoax productive scramble swam loony gloomy lair smug prostitution destructive humility grammar nagging monstrous obstruction diarrhea violate pompous revenue decaf nomination antenna reflexes tart preach honk furry collective slash limbo franchise countless purity vermin bankruptcy retain squeak bien pushy usher ordeal gypsies condemn detonator nuke incision loo omelet exterior uncertain swab viable barefoot downright patriotic duel unfaithful sweatshirt glide checkbook rinse suburbs meth truthfully gobble calculated ballistics compatible unaware frigging senators hottie stimulating putz inhale goons testament grumpy douche shady epic curl ere rightful nominated throttle corral undead beverage meatloaf organisation calculations chic graphic wedge woe semi venom indefinitely cant whim odor simultaneously tov cobbler hallucinations vocabulary mumbling preference pas reasonably decorate siege unauthorized dibs retail flop pluck remedy hooters regime bleach kangaroo phenomenal scrolls comply soy amulet speculation cheesecake airfield nightfall liberation utmost graceful ballerina mow jester sling backseat mortar swung stockholders inventor congregation negotiation schizophrenic kite doth hallowed questionable fetish granddaddy suburban forgave geography duplicate conceive sera monument gallon crispy moth hors tread itchy jerky meadow edgy jukebox hysteria yogurt goon chant frantic scroll intersection horseshit reflex ownership flair captive chaplain unborn broccoli terrain sanitarium translator awareness cabaret simulation sensor knitting moody mayonnaise aluminum affectionate withdrawn militia comfy perjury memorable softball soothing spacecraft correspondence vultures offshore deranged crocodile pipeline utility probability opium infamous granddad habitat dependent tremble salami stem plunge biblical prescribed strung pretzels console suspense mas clarify oblige stench minority wiener jacked grunt goof incorrect larceny snails advocate subpoena shrapnel payoff combine tilt picket coupons aroused diabetic heartbreak charade dire redemption thermal grieve brutality greenhouse gauge solemn rabies lurking transform watermelon encouragement fungus afterward unbelievably constitutional puberty intensive textbook thermometer headmaster editorial underage noose import wanker raisins cliffs quaint ante melancholy huddle smear passive boar erection sleazy arcade exhausting skid nag treacherous holster merrily constructive sinister discrimination customary undefeated perp persuasive picky abstract lawful irritating fallout coupon ongoing snob deported renew dads sterile gourmet crucify sank upgrade uncommon nausea correspondent interstate criticize tee hijacked civic minimal cuddle disposition roster radiant cushion formality fearful spectrum anguish uncles defective troublemaker mantle vie vending orchid cloudy unseen ventilation cameraman oppose hock drool allegations poof stylish pickin implant lice rink slay courtyard goo blur depart compensation mushroom uranium exaggerating diplomat incomplete twitch mayhem truthful whiskers firemen ridden oneself accommodate spree competitors intellect missionary dew boredom civilisation controversial auxiliary flier crossroads ozone slutty craving catchy hamster silverware exhaust applaud excite salsa disarm bodily tile freelance enlighten flute threesome mentality ingenious panda snip mackerel barbershop stairwell brawl tack snot dense youse deli dictator intentionally array waffle outnumbered catalogue hygiene seemingly ether editing detour vine mischief projection goggles beak crazed weatherman prevail bimbo containment contrast intercom clarity blaze prosperity insulin checkup outdoors titty coronation psychiatry doodle thong measles decorator trifle admiration communism despicable crest dynamic snowboarding blacksmith unanimous stride moans miraculous paramedic specs wreckage email unsolved consumer pioneer crave ghastly nasal impotent rhino quart detonate safari calculate plaque conception landlady voters gunman manure haste index trend uneasy foolishness commotion maggots communion caterer loathe oats possum marital espresso beetle weave disrespectful parental consume lunar removal superstition nighttime colonial diaphragm whooping authorize limitations primarily lowlife decay confiscated biggie manpower imprisoned fruitcake princes seventy hoist howl unavailable circumstance apprehended educate fishermen glitter assurance promptly outline surplus pedal plank filmmaker lavender budge frown refrain forum unmarried appoint cum cooperative portfolio bale onstage gruesome pointy bono charitable brook fairness fraction babysit hybrid enchanting pharmaceutical vivid organism hillbilly cerebral frenzy mainframe outlook wrinkles repulsive lantern render aide graffiti radiator fiery chariot divert pelvis crock refined instruction cosy glitch vibrations pavement hovering seafood anarchy meltdown distorted voluntary dishwasher homicidal solitude shores preoccupied hateful sparkling measurements smuggle outlet characteristics pretzel hick cot rustling exterminator arsenal snuff teamwork straightforward dosage immortality maturity sincerity intro syndicate poo candid livestock extraterrestrial gall manicure perceptive fidelity oblivion span moor midterm billing remarkably hypnosis disability absorb segment squeaky gateway git mileage messin loco mythology swimsuit capabilities anesthesia transformation aneurysm impostor cucumber freckles roadblock coronary participation whatnot banished fertilizer hula stakeout incentive floss plutonium gradually modified milligrams predicament persuasion obedient unforgivable ridicule devote affidavit paralysis dome margin lest walnut moi neural cleanup chaperone bloodshed siblings nightgown topless darts barf forgery ducky speedy hatchet stumble baptized voluntarily marvel apprentice octopus arthritis thud cranberry contemporary eyesight residency urn pansy blizzard turbulence outrun thump appalling deprived syringe adultery contractions definitive exaggerate desirable climax painless professors puddle bologna outbreak oeuvres cuisine enjoyable serpent hearty multiply likeness complexion rotate supervise festive refugee sow descend salesmen shameful decree latch compulsive looky orchard billionaire uncover wildlife firepower tyrant pastry bedside oasis deluxe interrogate muse obsolete revolting fashionable vaccine peril respectfully mercenary continuous mistletoe syphilis cosmetics navigate dart placement confrontation hallucinating wormhole understudy laddie digits unworthy snag snowman muck photographic marshmallows publicist receptionist bulk pollution flashy pretentious lilies compelling respectful knit cider leukemia cremated shameless hep brochure fertility statute equality shag spouse composed fundraiser confide electromagnetic forecast exploration companionship schoolgirl intubate quo creativity accomplishment interruption fragment puncture treachery indicted frontal withholding chem sorority raspberry basin plow conquest assassinate anthem stance complimentary headlights relish wrinkle stun carton stutter symptom checkers postal moan traction etiquette humanitarian exorcism humbly bonnet grizzly amour rations celery confidentiality grants recreation indigestion flakes progressive quota fret waterfall theoretical dearie chemist speck wuss pesos dissolve horseback unspeakable gibberish dominate rigid rites fuzz inadequate armory lobe cholesterol tribal checkpoint quantity deceit reservoir surrogate exile bonny cello ruptured migraine biz revive adolescent requirements slab comprehend hazardous amends mockery pun strand repressed consumption conceited sod slid ravine slop bop surge pottery eyeball foolproof liberated camouflage trajectory geometry disposable brow boardwalk hesitation mortuary decoration hectic disconnect torso aloud trustworthy clueless adieu foe structural heartbroken murderous detonation aura prima disgraceful spurs accordingly handyman ample homie mosquito spawn gringo acre overweight pulp trivial buttocks cassette amp ell chopsticks buzzard faraway wilt feminist humane fatigue dehydrated chord degenerate raffle detain imprisonment outdoor selfless trot evasive uterus clot barbarian flunk emptiness suede tainted coalition palp crumb bunnies incense iceberg logo freshmen slain heed keyboard prone imitate dreary realtor cosmetic moist kiddies racetrack cyanide rodent transparent pinpoint tranquilizer kilos markings groin unattractive brewery bitty dinnertime negligence disobeyed cowardice residential criteria hernia compassionate lovable bouncy distinguish hag overload commend serenity hobo particle genetically gallows juggling indecent hallucination disperse inhuman ethnic spiral tiara canisters giddy fangs reunited lollipop demented delete vulture publication modesty gala intrigued charcoal perks algebra directive parlour municipal buds obsessive abyss remarried nightcap pyjamas snail dung prestigious troupe redneck rethink screwy nonstop stability fascination sedan calcium outgoing unethical thrusters tenure sequel sinus sage flake leech nudity scarecrow dictate thrive whirl devious painkillers bossy bonfire varsity fitness righteousness alumni apt wad ballpark fantasize chemo sexist speechless pantry fluke crossword toenails mahjong staircase dings listeners eerie rubble harmonica farce rewind seaweed reconnaissance writ constructed wop meek hoof highlights deadbeat lullaby blindfold virtuous youngsters emerge petrified insomnia turnip coy racism mutation endorse murmuring premium riddance embedded upcoming bloodstream wench expansion understatement waive icon posture sandals gasp prehistoric rearrange bugle evaluate visualize blaring disclose invalid muttering heterosexual bio senile reduction obedience hemorrhage nitro intimidate giggle unstoppable chimes momentum navigation provisions praised baboon bondage paste sprouts nicotine shabby locket sinful inscription mindless orgy battleship sorcerer simmer scarce jig sadistic wack demise atropine astonishing degrading pantyhose deduction canteen intestines resemble formidable masturbation pouch espionage delegates omen squawk decipher peers relive bloated canopy spun informal benefactor shadowy compact renounce ancestor musketeers dilated sturdy ordinance allergy canine stalk perpetrator mouthful inquire lard washroom doorknob feeble rattlesnake encrypted upward louse seaman esteem puffy busboy vinegar armour entity tempo rejoice vascular neglect potty entrusted infinity jive guidelines asteroid pianist foremost enforce saxophone frisky plumb misguided perv administer strife voltage accommodations dependable wholesale unreliable overrun instruct malaria erratic ironically territorial articulate lash casserole lidocaine stature chickenshit infiltrate novelty fringe unleash backside pinkie dos candlelight summary disqualified birthmark itinerary lifeguard comp endanger sedated impound afloat prostate detection circumstantial lotto perky brainwashed clattering thieving disastrous sparkle presumably engraved successor pimple lacerations skateboard gunpowder ruse retribution bathrobe taxpayers eulogy mango fingertips eminent proximity backbone administrator components versa commodity malt triage sanctity commie credible patriotism texture disobey ludicrous advertise hypocrisy raincoat graft swiped ore overreacted nobility burrito mascot fanatic potassium meditation bungalow directory hombre turnout rephrase suffice rec vigilante whine playoffs refreshments gigolo encryption consecutive controversy unhealthy hype ferret countrymen raisin storeroom resource ing inconvenient lark manipulative mast redeem crutches gel gizmo abusive faulty banjo makeover plausible transvestite considerably accord consensus airway bub glands ointment marketplace wondrous wretch hymn evolve fiasco testosterone withstand commandment doubtful futile investigative molested prudent dominant disciplinary halo coz wallow galley timetable aphrodisiac blowjob godmother snore herbal exhaustion compressions fetus sailboat strengthen dodging plaid overdo administrative masquerade heinous deodorant gent nostrils harassed brothel takeout rehabilitation shivering handcuffed amaze reconstruction bachelorette eyelids coil purge swipe glare immense bias airspace disciples lac socket marking unification provocative relevance clubhouse induce whoopee calves chowder tyranny quake honky maggot yearning mangy reopen circular accordance duration chuckle hearse philosophical grits renal afterlife famine rooftop coordinator stamina borderline encyclopedia mathematical impeccable frail component diplomacy geese dumplings wont polygraph momentarily lagoon influential cooped staggering muzzle minions pillar redo discomfort stairway thaw citation stag minivan heathen latitude mic inability visitation sundae discouraged wholesome yarn agreeable granite compose recycling auditorium bamboo misty clarinet kilo bayonet quartet obsessing hideout pediatric occult panicking malicious bonded titanium petrol gangsta goodbyes phenomena jiffy clientele cylinder strut binoculars takeover sever porcelain grotesque scrawny flawless relaxation patronize hinges horrifying dreamy sprained toot recollection shitload gloat fertile vibration railway headphones enlist unprecedented hotline sympathize immigrant highlight luau ferocious shrunk symbolic unfit risen user distinctive mirage reproduce girdle quad ravishing freezes carcass detached frisk python tactic hepatitis perpetual whorehouse fossil disable critters beseech eggnog implications unexplained mistook hijack tumble completion optimism fussy vandalism malpractice revolt leprechaun youthful biopsy behavioral tenor commanders troublesome escrow muscular aunts spat thereby aerobics distraught domination thorns calories relentless hedge artwork poachers stung contingency grownups arithmetic ploy vector transcripts generic pharmacist pelvic sesame optimist peer acquitted distributor sitcom java daisies hearsay shoplifting pasture propeller guru pornographic setback lateral swoop shutters solace extinguisher transfusion hellhole feat classmate mag rut dysfunctional scoffs blockade britches undertaker scuba soar capitalist shillings unprepared grandchild restrain aorta unfamiliar gymnastics shiver instrumental pinball childbirth quarry disagreement unprofessional cram unsafe mushy whilst eldest electrons continuum intrigue corpus err apparatus firewood sheik ado dis napalm dialysis nibble honorary interface cashmere vertebrae hardworking hurrying sensual sham timid hardship unharmed forsaken marshmallow werewolves judgmental daycare sob weakened twerp presiding adversary cockeyed organised dopamine horizontal mound petals suffocate mortality gland whimpers remainder haze ripple browns expendable lifelong edit uncanny blowout distribute extinction tablet annulment mano comfortably electrician privy soften resentment mandate persona endeavor groundhog stabilize vat unheard tonsils dislocated firearm incompetence giraffe attire accuracy oppression woken occupational fireball duffel hemisphere commentary astray teammates pocketbook livelihood vortex potent ammonia joyful suppress cipher blasphemy sightseeing perceived lag starvation pathological devised prune shutdown centimeters quicksand satchel splinter uplink skeptical contraption assailant retro badass trademark barricade maternal barren intentional dowry enclosed stricken unclear firsthand complicate smallpox typhoon reproduction vicar conspicuous godforsaken brilliance springtime plump artifacts playback pox humorous shilling ruckus biography contradiction enable microchip stripe marksman stormy impersonating layaway caravan rite rundown newlyweds chastity retract cleanse irritable tampered invaders acquisition overcoat gloss narc redundant correctional sprinkle jellyfish corrections mystic pulmonary stockade folly beforehand imagery sublime latex tiresome shutter extracurricular indestructible extravagant sleepover resourceful enlightenment termites reins riled bom prescribe oversight undermine linger puny untrue heroine youngster hos rummy heartache perceive juggle construct talisman outburst litigation delegate raccoon carousel spur faucet newspaperman canister urgency preview wasp magnitude inconsiderate dismount eel detest inflicted interact pathology overreact snug yap gauze dyed bridegroom misdemeanor density apprehend penance coworkers venue dubious goalie cluck rematch tract rebuilt tedious trespass concierge gravel requirement restrictions automated famished helium glucose aviation spikes rump evicted hamper heartfelt fluff elect illustrious pediatrician nameless listener elusive regroup dopey chandelier loon barbaric installation gunfighter gopher reassuring trusty hippo therapeutic eject reptile accountable bbs horrified perk diagnostic ballad hyena shrewd trolley parameters bitterness bloodbath intervene believable shatter donut unorthodox enema masseuse gynecologist colossal councilman frosting septic llama penetration playwright pardner trough reassigned pointers brimstone frigid thoughtless delicacy eyebrow lifeboat feisty aeroplane explicit gymnasium ogre twit cuddly peppermint pedestrian yak slingshot nicked crackling festivities unkind fictional garment universities hammock tetanus arraignment deemed merge complication wildcat reload rung uninvited wept cabbie grownup nifty brittle icing endorsement crumble parcel slang output reclaim delinquent gout jugular chunky ivory finesse snowball transponder hospitalized mediocre margarita seasick statistically daybreak competitor capability drought flattery curriculum misjudged bubbly haystack tram stimulate millimeter blurry berserk flannel ceremonial guerrillas peninsula crypt shawl magistrate stationery sentry banter rabid edible laundering lapse prestige bickering cleavage blisters periscope mitt marshals phat smut unwanted horrific imaginative unmarked manic expel delegation triumphant brighten forthcoming startling hickey census jolt irritated prude stimulation piercing accelerator beneficiary contemplating overthrow literal shank documentation starch intolerable presumptuous spiked temporal geezer hereafter satanic pagan concession beige dispense pedophile meddling unthinkable manipulation duly schizophrenia carefree scripture banish ballot mastermind coarse sleepless trapeze contradict suitor cotillion unfold winch crease boundary duds sauna schematics fest intermission conservatory stair wholly billboard shindig uncertainty enjoyment physicist bribery aristocrat simplicity rambling ecstatic jailhouse inland hurl inflict almonds outward entourage hormone contusions joyous twig aroma tasteful lockup judicial havoc nylon hitchhiking humidity nationwide tragically standpoint anesthetic originated relic groupie consists girly oversee gentry jest fingernail obituary spunk dildo termination harass brethren defenseless prospective specialize clash endurance psychosis discourage seams trainee evident daft debutante renegade reverence ominous aversion initiation citizenship kamikaze medallion kiddie bayou willingness dribble unholy deathbed hast adjacent halftime stampede quail secretive claustrophobic subscription swarm lint detox pear indoor metres cleaver arterial dialect illegitimate dangle whup amnesty pedestal peddling farmhouse prodigy inhibitor paranormal gorge elope bran banister hypnotic pellet smothered trustees unannounced accordion scold homage excruciating dimples falsely anthropology prerogative outcast barbed brooch loins postmortem superiority awoke alignment strive cluster garter tampering huff twenties schoolboy astronomy crybaby blindness negotiator metallic clover hailing squaw madhouse twirl crutch para nutcase prohibited equity renowned zillion microfilm scourge infidelity archive chitchat commune deprive slew outpost expectation headless damnation bodega twat bulldozer dazzling injunction sac refusal anthrax prediction harmful knuckle unwind deformed attentive asbestos sewn vaginal unpopular clink adjourn turban calculator ration extradition converse topside surpassed uncool perverse rupture beaut conversion lucrative overture duet snuggle conjunction penal reeks energetic trio ting pap decisive landfill escalator confer intake epiphany pooch mocha vials hoodlum prowl fixtures dementia condescending feud reincarnation foggy kerosene astounding elimination handgun victorious burp invaluable raggedy hex echoes carotid crowbar jitters confessional hooves vial hairdo electrocuted fruity hangman ultimatum hisself soothe downside dealership herpes boa visionary impolite tush implicated luscious bookkeeper wharf runny detachment tolerant eunuch vendor export depraved accelerate cancellation hiccups disrupt socialist investor afflicted possessive infectious livery knickers pajama chestnut posh inevitably sirree mutilated streetcar constitutes pebble paradox oppressed goblins snotty dias cartel elegance susceptible podium lewd divulge gon critter singularity singular tryouts trombone lucid catastrophic architectural memento registry intervals swans emphasis relocate slum windmill diagram fib unclean pretext chrome motorcade procession imprint orbital cheeky composite crackhead campfire sax consultation vibrating downstream iodine lifeless inhabitants conjure sedate showdown checkout wannabe pushups underlying swordsman germ poised envious residual hubba bucking seriousness blitz exceed armpit prosperous fiesta clippings craziness slaughterhouse gunmen veterinarian custard insubordination hives housework gullible stow sahib mascara concubine valor toupee rejoin approximate biologist embark hypocritical downfall captivity combustion haywire dud slander aspirations aggravated conformed volts overslept variation retaliate deployment mid landmark creme toolbox munitions coon bitchy ventilator petroleum subsequent trampled meddle bona advancement implement compression contemplate moderate bellboy coleslaw revised respiration axle menopause polyester nuggets bashful anomaly owing breathtaking flatten stingy caramel serene cesspool friction unprotected hussy blueprint vinyl malignant priestess wart measly navel compulsion arsenic femme valedictorian genitals incriminating diminished leper turmoil outright playmate penniless ugliness pushover catfish revoked mainstream plight sketchy conscientious eyelashes foil moisture hillside cordial melodramatic disoriented isle lifesaver mammal jiggle firehouse infect buzzes manhunt observant ceramic courteous hairline speculate excrement masturbate fig exhales selves furnished deluded etcetera untold nocturnal booger buttermilk avocado animation daddies genocide arouse poached hefty drunkard mannequin nitwit thereafter taboo skillet merrier saucy inbound seagull wring vendetta shite smitten adventurous discarded projector whomever platonic racquetball crit pollen unnoticed patrolman hurried glorified chimpanzee govern nourishment shoppers horsepower inspirational neutralize umbilical gazelle crayons nitrogen replay carnal appetizer merciless culinary hypnotized persist necktie triplets epileptic stickup unavoidable docket rosary sapphire dishonor animated oxide tuba keel chivalry dysfunction prophets premise frivolous dainty slump omelette gills technicality dusk gook heifer insolent maroon commandos advertisement summertime scrapbook novelist conceivable bony concur preschool matey grovel baptism dissertation leftover rumba visibility conclusive flavour seaboard icky proprietor readiness selective moot persecution nugget spokesman homeowner cavalier vibrator evolutionary infernal piranha recharge cadaver smother borough weaken croc characteristic distortion mosque carte sanitation ballast throbbing piston hereditary pubic blob buoy pamphlet blackboard loitering sulfur stateside whoosh decadent affliction mumps occurrence revival contamination fragrance bonehead yanked hermit lithium mite lush newfound coordination moat infrastructure decrease splendor uncharted spotless cowgirl crucifix bourgeois sulking creamy steadily brazen shenanigans groves laceration distasteful filly downward horoscope sewage startle interaction ornery passageway receptive lull zing pertinent fickle erect malice queue dormant foxes fetal scorn fastball aggravation frightful sideburns unwilling duress temperament dost epinephrine authenticity foundations prompt invasive pliers gloom untraceable bleachers spic chemotherapy mumbo liberate solitaire mistrial fluent sheriffs evasion ballistic recipient buildup lbs upbringing simulate attachment jocks lightweight playful homeroom unjust saviour indebted traumatized courtship snort upholstery hover unified shimmy lingo volatile uprising unhappiness wristwatch recurring condone cutters excluded croak homestead propulsion molten sunup rural racehorse afar appalled mousse albino".split(" ");
+
 
 /* ================= FSRS-5 ================= */
 const W=[0.40255,1.18385,3.173,15.69105,7.1949,0.5345,1.4604,0.0046,1.54575,0.1192,1.01925,1.9395,0.11,0.29605,2.2698,0.2315,2.9898,0.51655,0.6621];
@@ -414,14 +495,17 @@ function save(which,now){
 }
 /* Waar je gebleven was: sessie en opdracht worden na elke stap bewaard */
 function resumeBody(){
-  return {date:today(),view,
-    S:S.active?{date:S.date,step:S.step,queue:S.queue,idx:S.idx,flipped:S.flipped,input:S.input,text:S.text,fb:S.fb,reviewed:S.reviewed,added:S.added,elapsed:Math.round((Date.now()-S.start)/1000)}:null,
+  const ser=s=>s.active?{track:s.track,date:s.date,phase:s.phase,queue:s.queue,idx:s.idx,flipped:s.flipped,input:s.input,text:s.text,fb:s.fb,reviewed:s.reviewed,added:s.added,newWords:s.newWords,newIdx:s.newIdx,learned:s.learned,elapsed:Math.round((Date.now()-s.start)/1000)}:null;
+  return {date:today(),view,cur:S.track,SS:{werk:ser(SESS.werk),dagelijks:ser(SESS.dagelijks)},
     T:T.active?{t:T.t,elapsed:taskElapsed(),text:T.text,fb:T.fb,chat:T.chat,checked:T.checked}:null};
 }
 function applyResume(r){
   if(!r)return false;
   let restored=false;
-  if(r.S&&r.S.date===today()){Object.assign(S,r.S,{active:true,loading:false,err:""});S.start=Date.now()-(r.S.elapsed||0)*1000;}
+  const restoreS=(tr,o)=>{if(!o||o.date!==today())return;const s=SESS[tr];Object.assign(s,newS(tr),o,{track:tr,active:true,loading:false,err:""});s.start=Date.now()-(o.elapsed||0)*1000;};
+  if(r.SS){restoreS("werk",r.SS.werk);restoreS("dagelijks",r.SS.dagelijks);}
+  else if(r.S){restoreS("werk",{...r.S,phase:["review","task","fb","done"][r.S.step]||"review"});}
+  if(r.cur&&SESS[r.cur])S=SESS[r.cur];
   if(r.T&&r.T.t){Object.assign(T,r.T,{active:true,loading:false,err:"",summary:null,paused:true});}
   if(r.view==="sessie"&&S.active){view="sessie";restored=true;}
   else if(r.view==="taak"&&T.active){resumeTask(true);restored=true;}
@@ -457,9 +541,10 @@ function finishBoot(resume){
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const icon=(n,cls)=>`<svg class="${cls||""}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
-const due=()=>Object.entries(state.cards).filter(([,c])=>c.due<=Date.now()).sort((a,b)=>a[1].due-b[1].due);
+const due=tr=>Object.entries(state.cards).filter(([,c])=>c.due<=Date.now()&&(!tr||trackOf(c)===tr)).sort((a,b)=>a[1].due-b[1].due);
 const minsToday=()=>state.profile.days[today()]||0;
-const sessionDone=()=>!!(state.profile.sessions||{})[today()];
+const sessionDone=tr=>{const p=state.profile;if(tr==="werk"&&(p.sessions||{})[today()])return true;return !!((p.sess||{})[tr]||{})[today()];};
+function markSessionDone(tr){const p=state.profile;p.sess=p.sess||{};p.sess[tr]=p.sess[tr]||{};p.sess[tr][today()]=true;}
 function addMinutes(m){const t=today();state.profile.days[t]=(state.profile.days[t]||0)+m;save("profile");}
 function streak(){let n=0;const d=new Date();if(!(state.profile.days[dkey(d)]>0))d.setDate(d.getDate()-1);while(state.profile.days[dkey(d)]>0){n++;d.setDate(d.getDate()-1);}return n;}
 const fmtClock=s=>String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
@@ -534,26 +619,30 @@ function verdictHTML(res){
   if(res.level==="close")return {chip:"amber",text:"Bijna: "+det,grade:2};
   return {chip:"red",text:"Nog niet"+(det?": "+det:"")+". Deze komt snel terug.",grade:1};
 }
-function dailyTask(){
-  if(state.profile.lastDaily!==today()){state.profile.dailyIdx=((state.profile.dailyIdx||0)+1)%DAILY_TASKS.length;state.profile.lastDaily=today();save("profile");}
-  return DAILY_TASKS[(state.profile.dailyIdx||0)%DAILY_TASKS.length];
+function dailyTask(tr){
+  tr=tr||"werk";const list=tr==="werk"?DAILY_TASKS:DAILY_TASKS_D,p=state.profile;
+  const kI=tr==="werk"?"dailyIdx":"dailyIdxD",kD=tr==="werk"?"lastDaily":"lastDailyD";
+  if(p[kD]!==today()){p[kI]=((p[kI]||0)+1)%list.length;p[kD]=today();save("profile");}
+  return list[(p[kI]||0)%list.length];
 }
 
 /* ================= Claude ================= */
-const TUTOR=`You are an English writing and speaking coach for a Dutch online marketing professional (level B1-B2) who wants to sound natural and professional in business English.
+const TUTOR_INTRO={werk:"You are an English writing and speaking coach for a Dutch online marketing professional (level B1-B2) who wants to sound natural and professional in business English.",
+  dagelijks:"You are an English writing and speaking coach for a Dutch adult (level B1-B2) who wants to speak and write natural everyday English: conversations, travel, series, news and social life. A casual register is fine when the task is casual."};
+const TUTOR=`
 Rules:
 - Give at most 3 improvement points, most important first. Prioritise errors typical for Dutch speakers (false friends, present perfect vs past simple, word order, literal translations), then unnatural phrasing, then style.
 - Explanations in Dutch, short and concrete. Corrections in English.
-- Give a natural, professional version of the whole text, staying close to the learner's own words.
+- Give a natural version of the whole text in the right register, staying close to the learner's own words.
 - Suggest up to 3 useful chunks from the corrections for spaced repetition: "nl" = Dutch cue, "en" = English chunk, "ex" = short example sentence.
 - "goed" = one specific thing the learner did well (Dutch, one sentence).
 - "categorie" per point: one of "valse vriend","tijden","woordvolgorde","letterlijk vertaald","woordkeuze","grammatica","stijl","spelling".
 Respond ONLY with JSON: {"goed":string,"punten":[{"fout":string,"beter":string,"uitleg":string,"categorie":string}],"versie":string,"kaarten":[{"nl":string,"en":string,"ex":string}]}`;
-const getFeedback=(task,text,extra)=>sample.json(`${TUTOR}\n\nTask given to the learner: ${task}\n${extra||""}\nLearner's text:\n"""\n${text}\n"""`,{modelTier:"default"});
-function applyFeedback(fb){
+const getFeedback=(task,text,extra,tr)=>sample.json(`${TUTOR_INTRO[tr||"werk"]}\n${TUTOR}\n\nTask given to the learner: ${task}\n${extra||""}\nLearner's text:\n"""\n${text}\n"""`,{modelTier:"default"});
+function applyFeedback(fb,tr){
   const now=Date.now();let added=0;
   (fb.kaarten||[]).slice(0,3).forEach((k,i)=>{if(!k||!k.en)return;
-    if(!Object.values(state.cards).some(c=>c.en.toLowerCase()===String(k.en).toLowerCase())){state.cards["f"+now+"_"+i]={nl:String(k.nl||""),en:String(k.en),ex:String(k.ex||""),src:"feedback",due:now+DAY,created:now};added++;}});
+    if(!Object.values(state.cards).some(c=>c.en.toLowerCase()===String(k.en).toLowerCase())){state.cards["f"+now+"_"+i]={nl:String(k.nl||""),en:String(k.en),ex:String(k.ex||""),src:"feedback",track:tr||"werk",due:now+DAY,created:now};added++;}});
   (fb.punten||[]).forEach(p=>{const c=p.categorie||"overig";state.profile.mistakes[c]=(state.profile.mistakes[c]||0)+1;});
   save("deck");save("profile");return added;
 }
@@ -581,7 +670,7 @@ const DICTATE=`<details><summary>Hoe spreek ik in?</summary><p class="small mute
 const needClaude=()=>sample?"":`<p class="small muted">Feedback van Claude werkt als je Other Biscuit via claude.ai opent.</p>`;
 
 /* ================= Router ================= */
-const NAV=[["vandaag","Vandaag","home"],["opdrachten","Opdrachten","tasks"],["kaarten","Kaarten","cards"],["voortgang","Voortgang","chart"]];
+const NAV=[["vandaag","Vandaag","home"],["woorden","Woorden","book"],["opdrachten","Opdrachten","tasks"],["kaarten","Kaarten","cards"],["voortgang","Voortgang","chart"]];
 let route=(()=>{try{return localStorage.getItem("we_route")||"vandaag";}catch(e){return "vandaag";}})();
 if(!NAV.some(n=>n[0]===route))route="vandaag";
 let view=null; /* null | "sessie" | "taak" */
@@ -598,7 +687,7 @@ function render(){
   const m=$("#main");
   if(view==="sessie") renderSession(m);
   else if(view==="taak") renderTask(m);
-  else ({vandaag:renderHome,opdrachten:renderTasks,kaarten:renderCards,voortgang:renderProgress})[route](m);
+  else ({vandaag:renderHome,woorden:renderWords,opdrachten:renderTasks,kaarten:renderCards,voortgang:renderProgress})[route](m);
   const key=view||route;
   if(key!==lastScreen&&m.firstElementChild) m.firstElementChild.classList.add("enter");
   lastScreen=key;
@@ -608,36 +697,39 @@ const noticeHTML=()=>storeMsg?`<div class="notice">${esc(storeMsg)}</div>`:"";
 
 /* ================= Vandaag ================= */
 function greet(){const h=new Date().getHours();return h<12?"Goedemorgen":h<18?"Goedemiddag":"Goedenavond";}
+function sessionCard(tr){
+  const s=SESS[tr],done=sessionDone(tr),t=dailyTask(tr),dc=due(tr).length;
+  const plan=tr==="werk"?[`${Math.min(dc,REVIEW_LIMIT)} kaarten herhalen`,`${TYPE_LABEL[t.type]}: ${esc(t.title)}`,"Feedback van Claude"]
+    :[`${Math.min(dc,DAILY_REVIEW_LIMIT)} kaarten herhalen`,`${NEW_PER_SESSION} nieuwe woorden`,`${TYPE_LABEL[t.type]}: ${esc(t.title)}`];
+  return `<section class="glass session-card ${tr}">
+    <div class="spread"><span class="chip ${tr==="werk"?"":"amber"}">${TRACK_LABEL[tr]}</span>${done?`<span class="chip green">${icon("check")} Gedaan</span>`:`<span class="small muted mono">± 8 min</span>`}</div>
+    <h2>${s.active?"Je was bezig":done?"Klaar voor vandaag":esc(t.title)}</h2>
+    <ul class="plan-list">${plan.map(p=>`<li>${p}</li>`).join("")}</ul>
+    <div class="row" style="margin-top:auto">${s.active?`<button class="btn primary" data-cont="${tr}">${icon("play")} Ga verder</button><button class="btn link" data-start="${tr}">Opnieuw beginnen</button>`
+      :`<button class="btn ${done?"ghost":"primary"}" data-start="${tr}">${icon("play")} ${done?"Nog een keer":"Start sessie"}</button>`}</div>
+  </section>`;
+}
 function renderHome(m){
   const goal=8,mins=minsToday(),pct=Math.min(1,mins/goal),C=2*Math.PI*64;
-  const dc=due().length,done=sessionDone(),t=dailyTask();
   const week=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);week.push({l:d.toLocaleDateString("nl-NL",{weekday:"short"}).slice(0,2),on:(state.profile.days[dkey(d)]||0)>0,today:i===0});}
   const weekMin=Object.entries(state.profile.days).filter(([k])=>{const d=new Date();d.setDate(d.getDate()-6);return k>=dkey(d);}).reduce((a,[,v])=>a+v,0);
   const sug=[...LONG_TASKS].sort((a,b)=>((state.profile.done[a.id]||{}).count||0)-((state.profile.done[b.id]||{}).count||0)).slice(0,3);
+  const v=vocab();
   m.innerHTML=`<div class="view">
     ${noticeHTML()}
-    <div><p class="eyebrow">${new Date().toLocaleDateString("nl-NL",{weekday:"long",day:"numeric",month:"long"})}</p><h1>${greet()}.</h1></div>
-    ${pausedTaskHTML()}
-    <section class="glass hero">
-      <div class="stack">
-        ${done?`<span class="chip green">${icon("check")} Sessie van vandaag gedaan</span>`:`<span class="chip amber">Dagelijkse sessie · ± 8 min</span>`}
-        <h2>${done?"Goed bezig. Wil je nog iets extra's doen?":"Vandaag oefen je: "+esc(t.title)}</h2>
-        <div class="plan"><span><i></i>${Math.min(dc,12)} kaarten herhalen</span><span><i style="background:var(--amber)"></i>${TYPE_LABEL[t.type]}: ${esc(t.title)}</span><span><i style="background:var(--green)"></i>Feedback van Claude</span></div>
-        <div class="row" style="margin-top:6px">
-          ${S.active?`<button class="btn primary big" id="continueSession">${icon("play")} Ga verder met je sessie</button><button class="btn link" id="startSession">Opnieuw beginnen</button>`
-          :`<button class="btn primary big" id="startSession">${icon("play")} ${done?"Nog een sessie":"Start sessie"}</button>
-          ${done?`<button class="btn ghost big" data-go="opdrachten">Langere opdracht</button>`:""}`}
-        </div>
-      </div>
-      <div class="ring" role="img" aria-label="${mins} van ${goal} minuten vandaag">
+    <div class="home-head">
+      <div><p class="eyebrow">${new Date().toLocaleDateString("nl-NL",{weekday:"long",day:"numeric",month:"long"})}</p><h1>${greet()}.</h1><p class="muted" style="margin-top:6px">Kies je sessie. Eén per dag houdt je reeks in stand.</p></div>
+      <div class="ring sm" role="img" aria-label="${mins} van ${goal} minuten vandaag">
         <svg viewBox="0 0 150 150"><circle class="track" cx="75" cy="75" r="64"/><circle class="fill" cx="75" cy="75" r="64" stroke-dasharray="${C}" stroke-dashoffset="${C}" data-off="${C*(1-pct)}"/></svg>
         <div class="lbl"><div><b>${mins}</b><span class="small muted">van ${goal} min</span></div></div>
       </div>
-    </section>
+    </div>
+    ${pausedTaskHTML()}
+    <div class="sessions">${sessionCard("werk")}${sessionCard("dagelijks")}</div>
     <section class="kpis">
       <div class="glass kpi"><span class="eyebrow">Op rij</span><b>${streak()}</b><span class="small muted">dagen</span></div>
-      <div class="glass kpi"><span class="eyebrow">Kaarten klaar</span><b>${dc}</b><span class="small muted">om te herhalen</span></div>
       <div class="glass kpi"><span class="eyebrow">Deze week</span><b>${weekMin}</b><span class="small muted">minuten</span></div>
+      <div class="glass kpi"><span class="eyebrow">Woordenschat</span><b>${v.test?"±"+fmtNum(v.test.size):"?"}</b><span class="small muted">${v.test?"woorden":`<button class="btn link" data-go="woorden" style="padding:0">Doe de test</button>`}</span></div>
     </section>
     <section class="glass pad stack">
       <div class="spread"><h3>Afgelopen 7 dagen</h3><span class="small muted">Elke dag even oefenen werkt beter dan één keer lang</span></div>
@@ -649,44 +741,109 @@ function renderHome(m){
     </section>
   </div>`;
   requestAnimationFrame(()=>requestAnimationFrame(()=>{const f=m.querySelector(".ring .fill");if(f)f.style.strokeDashoffset=f.dataset.off;}));
-  $("#startSession").onclick=startSession;
-  if($("#continueSession"))$("#continueSession").onclick=()=>{view="sessie";render();window.scrollTo({top:0});};
+  m.querySelectorAll("[data-start]").forEach(b=>b.onclick=()=>startSession(b.dataset.start));
+  m.querySelectorAll("[data-cont]").forEach(b=>b.onclick=()=>continueSession(b.dataset.cont));
   bindTaskCards(m);
   m.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
 }
 
-/* ================= Dagelijkse sessie ================= */
-const S={step:0,queue:[],idx:0,flipped:false,input:"",text:"",fb:null,loading:false,err:"",start:0,reviewed:0,added:0};
-const REVIEW_LIMIT=12;
-function startSession(){
-  Object.assign(S,{active:true,date:today(),step:0,queue:due().slice(0,REVIEW_LIMIT).map(([id])=>id),idx:0,flipped:false,input:"",text:"",fb:null,loading:false,err:"",start:Date.now(),reviewed:0,added:0});
-  if(!S.queue.length)S.step=1;
+/* ================= Dagelijkse sessies: Werk en Dagelijks Engels ================= */
+const REVIEW_LIMIT=12,DAILY_REVIEW_LIMIT=10,NEW_PER_SESSION=5;
+const TRACK_LABEL={werk:"Werk",dagelijks:"Dagelijks Engels"};
+const PHASES={werk:[["review","Herhalen",3],["task","Opdracht",4],["fb","Feedback",1]],dagelijks:[["review","Herhalen",2],["new","Nieuwe woorden",2],["task","Opdracht",3],["fb","Feedback",1]]};
+const newS=tr=>({track:tr,active:false,date:"",phase:"review",queue:[],idx:0,flipped:false,input:"",text:"",fb:null,loading:false,err:"",start:0,reviewed:0,added:0,newWords:null,newIdx:0,learned:[],newErr:""});
+const SESS={werk:newS("werk"),dagelijks:newS("dagelijks")};
+let S=SESS.werk;
+function startSession(tr){
+  tr=tr||"werk";S=SESS[tr];
+  Object.assign(S,newS(tr),{active:true,date:today(),start:Date.now(),queue:due(tr).slice(0,tr==="werk"?REVIEW_LIMIT:DAILY_REVIEW_LIMIT).map(([id])=>id)});
+  if(!S.queue.length)nextPhase();
   view="sessie";render();window.scrollTo({top:0});
+  if(tr==="dagelijks")loadNewWords();
 }
+function continueSession(tr){S=SESS[tr];view="sessie";render();window.scrollTo({top:0});if(tr==="dagelijks"&&!S.newWords)loadNewWords();}
+function nextPhase(){
+  if(S.phase==="recall"){S.phase="task";return;}
+  const ph=PHASES[S.track].map(p=>p[0]);
+  S.phase=ph[ph.indexOf(S.phase)+1]||"done";
+  if(S.phase==="new"&&!sample)S.phase="task";
+}
+function vocab(){const p=state.profile;p.vocab=p.vocab||{next:1000,known:{},test:null};return p.vocab;}
+const fmtNum=n=>Math.round(n).toLocaleString("nl-NL");
+let wordsLoading=false;
+async function loadNewWords(){
+  const s=S;if(s.newWords||wordsLoading||!sample)return;
+  wordsLoading=true;s.newErr="";if(view==="sessie")render();
+  try{s.newWords=await fetchWords(NEW_PER_SESSION);}catch(e){s.newErr=sampleError(e);}
+  wordsLoading=false;if(view==="sessie")render();
+}
+/* Volgende woorden uit de frequentielijst die je nog niet kent en nog niet leert */
+async function fetchWords(n){
+  const v=vocab(),have=new Set(Object.values(state.cards).map(c=>String(c.en).toLowerCase()));
+  const pick=[];let i=v.next;
+  while(pick.length<n+3&&i<WORDS.length){const w=WORDS[i++];if(!v.known[w]&&!have.has(w))pick.push(w);}
+  if(!pick.length)return [];
+  const r=await sample.json(`You help a Dutch adult (level B1-B2) learn everyday English words. For each word below give:
+"nl" = the most common Dutch translation (short, max 4 words; add "(ww)" for a verb or "(bn)" for an adjective when the word could be read several ways),
+"ex" = one natural everyday example sentence (max 14 words) that uses the word,
+"skip" = true if the word is a name, an interjection, offensive, or not useful to learn.
+Words: ${pick.join(", ")}
+Respond ONLY with JSON: {"words":[{"en":string,"nl":string,"ex":string,"skip":boolean}]}`,{modelTier:"quick"});
+  const byEn={};(r.words||[]).forEach(x=>{if(x&&x.en)byEn[String(x.en).toLowerCase()]=x;});
+  const out=[];let last=null;
+  for(const w of pick){
+    if(out.length>=n)break;
+    const x=byEn[w];last=w;
+    if(!x||x.skip||!x.nl){v.known[w]=2;continue;}
+    out.push({en:w,nl:String(x.nl),ex:String(x.ex||"")});
+  }
+  if(last)v.next=Math.max(v.next,WORDS.indexOf(last)+1);
+  save("profile");
+  return out;
+}
+const say=(text,rate)=>{try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="en-GB";u.rate=rate||1;speechSynthesis.speak(u);}catch(e){}};
 function stepperHTML(){
-  const st=[["Herhalen",3],["Opdracht",4],["Feedback",1]];
-  return `<div class="stepper">${st.map(([l,mn],i)=>`<div class="${i<S.step?"done":i===S.step?"cur":""}"><i><u></u></i><span>${l} <span class="muted mono" style="font-weight:500">${mn} min</span></span></div>`).join("")}</div>`;
+  const ph=PHASES[S.track],cur=S.phase==="recall"?"new":S.phase,ci=cur==="done"?ph.length:ph.findIndex(p=>p[0]===cur);
+  return `<div class="stepper" style="grid-template-columns:repeat(${ph.length},1fr)">${ph.map(([k,l,mn],i)=>`<div class="${i<ci?"done":i===ci?"cur":""}"><i><u></u></i><span>${l} <span class="muted mono" style="font-weight:500">${mn} min</span></span></div>`).join("")}</div>`;
 }
 function renderSession(m){
-  const t=dailyTask();
+  const tr=S.track,t=dailyTask(tr);
   let body="";
-  if(S.step===0){
+  if(S.phase==="review"||S.phase==="recall"){
     const id=S.queue[S.idx],c=state.cards[id];
-    if(!c){S.idx++;if(S.idx>=S.queue.length)S.step=1;return renderSession(m);}
+    if(!c){S.idx++;if(S.idx>=S.queue.length)nextPhase();return renderSession(m);}
     const vd=S.flipped?verdictHTML(checkAnswer(S.input,c.en)):null;
     const sug=vd?vd.grade:0;
-    body=`<div class="spread"><span class="eyebrow">Kaart ${S.idx+1} van ${S.queue.length}</span><button class="btn link" id="skipRev">Sla herhalen over →</button></div>
+    body=`<div class="spread"><span class="eyebrow">${S.phase==="recall"?"Nieuw woord oefenen":"Kaart"} ${S.idx+1} van ${S.queue.length}</span>${S.phase==="review"?`<button class="btn link" id="skipRev">Sla herhalen over →</button>`:""}</div>
     <div class="flash ${S.flipped?"flipped":""}"><div class="inner">
       <div class="glass face front"><span class="eyebrow">Hoe zeg je dit in het Engels?</span><div class="q">${esc(c.nl)}</div>
         <input type="text" id="revIn" placeholder="Typ je antwoord en druk op Enter (spelling hoeft niet perfect)" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(S.input)}" ${S.flipped?"tabindex=-1":""}>
       </div>
-      <div class="glass face back"><span class="eyebrow">${esc(c.nl)}</span><div class="a">${esc(c.en)}</div><p class="muted">${esc(c.ex)}</p>
+      <div class="glass face back"><div class="spread"><span class="eyebrow">${esc(c.nl)}</span><button class="btn link" id="sayCard" style="padding:0">${icon("sound")} Luister</button></div><div class="a">${esc(c.en)}</div><p class="muted">${esc(c.ex)}</p>
         ${S.input?`<p class="small">Jij schreef: <b>${esc(S.input)}</b></p>`:""}${vd?`<p class="verdict ${vd.chip}">${vd.text}</p>`:""}</div>
     </div></div>
     ${S.flipped?`<div class="stack" style="gap:8px"><span class="small muted">Jij beslist. De gemarkeerde knop is een voorstel. Onder elke knop staat wanneer de kaart terugkomt.</span>
       <div class="grade">${[["Opnieuw",1],["Moeilijk",2],["Goed",3],["Makkelijk",4]].map(([l,g])=>`<button data-g="${g}" class="${g===sug?"sug":""}">${l}<small>${fmtInt(intervalDays(c,g,Date.now()))}</small></button>`).join("")}</div></div>`
     :`<div class="row"><button class="btn teal" id="flip">Toon antwoord</button><span class="small muted">Of druk op Enter</span></div>`}`;
-  }else if(S.step===1){
+  }else if(S.phase==="new"){
+    if(!S.newWords){
+      body=`<div class="glass pad stack" style="align-items:flex-start">${S.newErr?errHTML(S.newErr)+`<div class="row"><button class="btn teal" id="retryNew">Opnieuw proberen</button><button class="btn link" id="skipNew">Sla nieuwe woorden over →</button></div>`
+        :`<p class="loading-dots">Claude zoekt je nieuwe woorden</p><button class="btn link" id="skipNew">Sla nieuwe woorden over →</button>`}</div>`;
+    }else if(S.newIdx>=S.newWords.length){
+      if(S.learned.length){S.phase="recall";S.queue=S.learned.slice();S.idx=0;S.flipped=false;S.input="";}else nextPhase();
+      return renderSession(m);
+    }else{
+      const w=S.newWords[S.newIdx];
+      body=`<div class="spread"><span class="eyebrow">Nieuw woord ${S.newIdx+1} van ${S.newWords.length}</span><button class="btn link" id="skipNew">Sla nieuwe woorden over →</button></div>
+      <section class="glass pad stack newword">
+        <div class="spread"><span class="word-en">${esc(w.en)}</span><button class="btn ghost" id="sayNew">${icon("sound")} Luister</button></div>
+        <div class="word-nl">${esc(w.nl)}</div>
+        <p class="muted" style="font-size:1.05rem">${esc(w.ex)}</p>
+      </section>
+      <div class="row"><button class="btn ghost big" id="knowIt">Ken ik al</button><button class="btn primary big" id="learnIt">Leer dit woord</button></div>
+      <p class="small muted">Woorden die je kiest om te leren, oefen je meteen daarna door ze zelf te typen. "Ken ik al" slaat het woord voortaan over.</p>`;
+    }
+  }else if(S.phase==="task"){
     body=`<div class="glass pad stack">
       <div class="spread"><span class="chip ${t.type==="spreken"?"amber":""}">${TYPE_LABEL[t.type]} · ${esc(t.len)}</span></div>
       <h2>${esc(t.title)}</h2>
@@ -698,50 +855,66 @@ function renderSession(m){
       <button class="btn primary" id="dSend" ${!sample||S.loading?"disabled":""}>${S.loading?'<span class="loading-dots">Claude leest mee</span>':icon("spark")+" Vraag feedback"}</button></div>
       ${needClaude()}
     </div>`;
-  }else if(S.step===2){
+  }else if(S.phase==="fb"){
     body=`<div class="glass pad stack"><h2>Feedback op "${esc(t.title)}"</h2>${feedbackHTML(S.fb)}
       <div class="row" style="justify-content:flex-end;margin-top:6px"><button class="btn ghost" id="again">Nog een poging</button><button class="btn primary" id="finish">Sessie afronden</button></div></div>`;
   }else{
-    const mins=S.doneMins;
     body=`<div class="glass celebrate" id="cele"><div class="badge">${icon("check")}</div><h1>Sessie voltooid</h1>
-      <p class="muted">${mins} min geoefend · ${S.reviewed} kaarten herhaald · ${S.added} nieuwe uitdrukkingen</p>
+      <p class="muted">${S.doneMins||1} min geoefend · ${S.reviewed} kaarten herhaald · ${S.added} nieuwe kaarten</p>
       <p><span class="chip amber">${streak()} ${streak()===1?"dag":"dagen"} op rij</span></p>
       <div class="row" style="justify-content:center;margin-top:8px"><button class="btn ghost" data-go="opdrachten">Langere opdracht doen</button><button class="btn primary" data-go="vandaag">Terug naar vandaag</button></div></div>`;
   }
   m.innerHTML=`<div class="view">
-    ${S.step<3?`<div class="spread"><button class="btn link" id="exit">${icon("back")} Later verder</button><span class="small muted">Wordt na elke stap bewaard</span></div>${stepperHTML()}`:""}
+    ${S.phase!=="done"?`<div class="spread"><button class="btn link" id="exit">${icon("back")} Later verder</button><span class="chip ${tr==="werk"?"":"amber"}">${TRACK_LABEL[tr]}</span></div>${stepperHTML()}`:""}
     ${body}</div>`;
   const ex=$("#exit");if(ex)ex.onclick=()=>{view=null;render();};
   m.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
-  if(S.step===0){
+  if(S.phase==="review"||S.phase==="recall"){
     const inp=$("#revIn");
-    const flip=()=>{S.input=inp.value.trim();S.flipped=true;renderSession(m);};
+    const flip=()=>{S.input=inp.value.trim();S.flipped=true;renderSession(m);save("resume");};
     if(inp&&!S.flipped){inp.focus({preventScroll:true});inp.onkeydown=e=>{if(e.key==="Enter")flip();};}
     const f=$("#flip");if(f)f.onclick=flip;
-    $("#skipRev").onclick=()=>{S.step=1;renderSession(m);};
+    const sc=$("#sayCard");if(sc)sc.onclick=()=>say(state.cards[S.queue[S.idx]].en);
+    const sk=$("#skipRev");if(sk)sk.onclick=()=>{nextPhase();render();};
     m.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{
       const id=S.queue[S.idx];state.cards[id]=review(state.cards[id],+b.dataset.g,Date.now());save("deck");
-      S.reviewed++;S.idx++;S.flipped=false;S.input="";if(S.idx>=S.queue.length)S.step=1;render();});
-    if(S.flipped) document.onkeydown=e=>{if(["1","2","3","4"].includes(e.key)&&view==="sessie"&&S.step===0&&S.flipped){const b=m.querySelector(`[data-g="${e.key}"]`);b&&b.click();}};
+      S.reviewed++;S.idx++;S.flipped=false;S.input="";if(S.idx>=S.queue.length)nextPhase();render();});
   }
-  if(S.step===1){
+  if(S.phase==="new"){
+    const sk=$("#skipNew");if(sk)sk.onclick=()=>{S.newWords=S.newWords||[];S.newIdx=S.newWords.length;render();};
+    const rt=$("#retryNew");if(rt)rt.onclick=()=>loadNewWords();
+    const w=S.newWords&&S.newWords[S.newIdx];
+    if(w){
+      $("#sayNew").onclick=()=>say(w.en);
+      $("#knowIt").onclick=()=>{vocab().known[w.en]=1;save("profile");S.newIdx++;render();};
+      $("#learnIt").onclick=()=>{const n=Date.now(),id="w"+n+"_"+S.newIdx;
+        state.cards[id]={nl:w.nl,en:w.en,ex:w.ex,src:"woord",track:"dagelijks",due:n,created:n};save("deck");
+        S.learned.push(id);S.added++;S.newIdx++;render();};
+    }
+  }
+  if(S.phase==="task"){
     const ta=$("#dText");ta.oninput=()=>{S.text=ta.value;$("#wc").textContent=wc(ta.value)+" woorden";save("resume");};
     $("#dSend").onclick=async()=>{
       if(S.text.trim().length<15){S.err="Schrijf of spreek eerst wat meer in.";return renderSession(m);}
       S.loading=true;S.err="";renderSession(m);
-      try{S.fb=await getFeedback(t.brief+" ("+t.len+")",S.text);S.added+=applyFeedback(S.fb);S.step=2;}catch(e){S.err=sampleError(e);}
+      try{S.fb=await getFeedback(t.brief+" ("+t.len+")",S.text,"",tr);S.added+=applyFeedback(S.fb,tr);S.phase="fb";}catch(e){S.err=sampleError(e);}
       S.loading=false;render();
     };
   }
-  if(S.step===2){
-    $("#again").onclick=()=>{S.step=1;S.fb=null;renderSession(m);};
+  if(S.phase==="fb"){
+    $("#again").onclick=()=>{S.phase="task";S.fb=null;renderSession(m);};
     $("#finish").onclick=()=>{
       S.doneMins=Math.max(1,Math.round((Date.now()-S.start)/60000));addMinutes(S.doneMins);
-      state.profile.sessions=state.profile.sessions||{};state.profile.sessions[today()]=true;save("profile");
-      S.step=3;S.active=false;render();confetti();
+      markSessionDone(tr);save("profile");
+      S.phase="done";S.active=false;render();confetti();
     };
   }
 }
+document.addEventListener("keydown",e=>{
+  if(view!=="sessie"||!(S.phase==="review"||S.phase==="recall")||!S.flipped||!["1","2","3","4"].includes(e.key))return;
+  const b=document.querySelector(`[data-g="${e.key}"]`);b&&b.click();
+});
+
 const wc=s=>String(s||"").trim().split(/\s+/).filter(Boolean).length;
 function confetti(){
   const el=$("#cele");if(!el||matchMedia("(prefers-reduced-motion: reduce)").matches)return;
@@ -751,20 +924,20 @@ function confetti(){
 }
 
 /* ================= Opdrachten ================= */
-const TF={dur:"alle",type:"alle"};
+const TF={dur:"alle",type:"alle",track:"alle"};
 function taskCard(t){
   const d=state.profile.done[t.id];
   return `<button class="glass tcard" data-task="${t.id}">
     <div class="spread"><span class="dur"><b>${t.mins}</b><span class="muted small">min</span></span><span class="chip ${t.mode==="rollenspel"?"amber":""}">${t.mode==="rollenspel"?"Rollenspel":TYPE_LABEL[t.type]}</span></div>
     <h3>${esc(t.title)}</h3><p>${esc(t.brief)}</p>
-    <div class="foot">${d?`<span class="chip green">${icon("check")} ${d.count}× · gem. ${Math.round(d.totalMins/d.count)} min</span>`:`<span class="chip line">Nog niet gedaan</span>`}</div>
+    <div class="foot"><span class="chip line">${trackOfTask(t)==="werk"?"Werk":"Dagelijks"}</span>${d?`<span class="chip green">${icon("check")} ${d.count}× · gem. ${Math.round(d.totalMins/d.count)} min</span>`:`<span class="chip line">Nog niet gedaan</span>`}</div>
   </button>`;
 }
 function bindTaskCards(m){m.querySelectorAll("[data-task]").forEach(b=>b.onclick=()=>startTask(LONG_TASKS.find(t=>t.id===b.dataset.task)));}
-const CUSTOM={desc:"",mins:20,type:"schrijven"};
+const CUSTOM={desc:"",mins:20,type:"schrijven",track:"werk"};
 function renderTasks(m){
   const fd=t=>TF.dur==="alle"||(TF.dur==="kort"&&t.mins<=15)||(TF.dur==="middel"&&t.mins>15&&t.mins<=30)||(TF.dur==="lang"&&t.mins>30);
-  const ft=t=>TF.type==="alle"||(TF.type==="rollenspel"?t.mode==="rollenspel":t.type===TF.type&&t.mode!=="rollenspel");
+  const ft=t=>(TF.type==="alle"||(TF.type==="rollenspel"?t.mode==="rollenspel":t.type===TF.type&&t.mode!=="rollenspel"))&&(TF.track==="alle"||trackOfTask(t)===TF.track);
   const list=LONG_TASKS.filter(t=>fd(t)&&ft(t));
   const fbtn=(k,v,l)=>`<button data-f="${k}:${v}" aria-pressed="${TF[k]===v}">${l}</button>`;
   m.innerHTML=`<div class="view">
@@ -773,6 +946,7 @@ function renderTasks(m){
     <div><p class="eyebrow">Voor als je meer tijd hebt</p><h1>Opdrachten</h1><p class="muted" style="margin-top:8px;max-width:60ch">Elke opdracht heeft een geschatte duur en een stappenplan. Een timer houdt bij hoe lang je er echt over doet, zodat je ziet of je sneller wordt.</p></div>
     <div class="stack" style="gap:10px">
       <div class="filters" role="group" aria-label="Tijd">${fbtn("dur","alle","Alle tijden")}${fbtn("dur","kort","10 tot 15 min")}${fbtn("dur","middel","20 tot 30 min")}${fbtn("dur","lang","45 min")}</div>
+      <div class="filters" role="group" aria-label="Spoor">${fbtn("track","alle","Werk en dagelijks")}${fbtn("track","werk","Werk")}${fbtn("track","dagelijks","Dagelijks Engels")}</div>
       <div class="filters" role="group" aria-label="Soort">${fbtn("type","alle","Alle soorten")}${fbtn("type","schrijven","Schrijven")}${fbtn("type","rollenspel","Rollenspel")}${fbtn("type","luisteren","Luisteren")}</div>
     </div>
     <div class="grid">${list.map(taskCard).join("")||'<p class="muted">Geen opdrachten met deze filters.</p>'}</div>
@@ -780,13 +954,14 @@ function renderTasks(m){
       <div><h3>Eigen opdracht</h3><p class="small muted">Plak een echte mail of beschrijf een situatie uit je werk. Kies de soort en hoeveel tijd je hebt.</p></div>
       <textarea id="cDesc" style="min-height:100px" placeholder="Bijv.: ik moet morgen een klant uitleggen waarom we overstappen naar Performance Max.">${esc(CUSTOM.desc)}</textarea>
       <div class="row">
+        <select id="cTrack" style="width:auto"><option value="werk">Werk</option><option value="dagelijks">Dagelijks Engels</option></select>
         <select id="cType" style="width:auto"><option value="schrijven">Schrijven</option><option value="spreken">Spreken</option><option value="rollenspel">Rollenspel</option></select>
         <select id="cMins" style="width:auto"><option value="10">10 min</option><option value="20">20 min</option><option value="30">30 min</option><option value="45">45 min</option></select>
         <button class="btn primary" id="cStart">${icon("play")} Start</button>
       </div>
     </section>
   </div>`;
-  $("#cType").value=CUSTOM.type;$("#cMins").value=String(CUSTOM.mins);
+  $("#cType").value=CUSTOM.type;$("#cTrack").value=CUSTOM.track;$("#cTrack").onchange=e=>CUSTOM.track=e.target.value;$("#cMins").value=String(CUSTOM.mins);
   m.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{const [k,v]=b.dataset.f.split(":");TF[k]=v;renderTasks(m);});
   bindTaskCards(m);
   $("#cDesc").oninput=e=>CUSTOM.desc=e.target.value;
@@ -794,7 +969,7 @@ function renderTasks(m){
   $("#cMins").onchange=e=>CUSTOM.mins=+e.target.value;
   $("#cStart").onclick=()=>{const d=CUSTOM.desc.trim();if(d.length<10){$("#cDesc").focus();return;}
     const rp=CUSTOM.type==="rollenspel",n=CUSTOM.mins;
-    startTask({id:"eigen",mins:n,type:rp?"spreken":CUSTOM.type,mode:rp?"rollenspel":"feedback",title:"Eigen opdracht",brief:d,
+    startTask({id:"eigen",track:CUSTOM.track,mins:n,type:rp?"spreken":CUSTOM.type,mode:rp?"rollenspel":"feedback",title:"Eigen opdracht",brief:d,
       role:rp?`Play the other person in this workplace situation described by the learner (in Dutch): "${d}". Stay in character, be realistic, ask follow-up questions.`:"",
       steps:[["Bedenk wat je wilt bereiken",Math.round(n*.2)],["Voer de opdracht uit",Math.round(n*.65)],["Neem de feedback door",n-Math.round(n*.2)-Math.round(n*.65)]]});};
 }
@@ -839,7 +1014,7 @@ async function aiTurn(){
 }
 async function sendTask(text,extra){
   T.loading=true;T.err="";render();
-  try{T.fb=await getFeedback(T.t.brief,text,extra);applyFeedback(T.fb);}catch(e){T.err=sampleError(e);}
+  try{const tr=trackOfTask(T.t);T.fb=await getFeedback(T.t.brief,text,extra,tr);applyFeedback(T.fb,tr);}catch(e){T.err=sampleError(e);}
   T.loading=false;render();
 }
 function finishTask(){
@@ -916,23 +1091,169 @@ document.addEventListener("click",async e=>{
   }
 });
 
+/* ================= Woorden ================= */
+const PSEUDO="grombet sprindle dacrent mollage fenderate plimsy trockle vintrous brastle cobbering snerl glomish prendable quintered flerrish drovish chandock wimbrel porrident strallow".split(" ");
+const READ_TOPICS=["reizen en vakantie","eten en koken","een opvallend nieuwsfeit","sport","technologie in het dagelijks leven","natuur en dieren","een stukje geschiedenis","psychologie en gewoontes","geld en sparen","films en series","muziek","gezondheid en slaap","wonen in de stad","een bekende uitvinding","werk en vrije tijd","vriendschap"];
+const WD={test:null,result:null,paste:"",pasteItems:null,pasteSel:{},pasteLoading:false,pasteErr:"",read:null,readLoading:false,readErr:"",readSel:{},readStart:0};
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+function buildTest(){
+  const items=[];
+  for(let b=0;b<9;b++){const band=WORDS.slice(b*1000,b*1000+1000);shuffle(band.slice()).slice(0,7).forEach(w=>items.push({w,band:b}));}
+  shuffle(PSEUDO.slice()).slice(0,10).forEach(w=>items.push({w,band:-1}));
+  return {items:shuffle(items),idx:0,yes:[]};
+}
+function scoreTest(t){
+  const fake=t.items.filter((x,i)=>x.band<0),fa=fake.filter(x=>t.yes[t.items.indexOf(x)]).length/fake.length;
+  const bands=[];
+  for(let b=0;b<9;b++){
+    const its=t.items.map((x,i)=>[x,i]).filter(([x])=>x.band===b),h=its.filter(([,i])=>t.yes[i]).length/its.length;
+    bands.push(fa>=1?0:Math.max(0,Math.min(1,(h-fa)/(1-fa))));
+  }
+  const size=bands.reduce((a,p)=>a+p*1000,0);
+  let start=bands.findIndex(p=>p<.8);if(start<0)start=8;
+  return {size,bands,fa,start};
+}
+function finishTest(){
+  const r=scoreTest(WD.test),v=vocab();
+  WD.test.items.forEach((x,i)=>{if(x.band>=0&&WD.test.yes[i])v.known[x.w]=1;});
+  v.next=Math.max(400,r.start*1000);v.test={date:today(),size:Math.round(r.size),bands:r.bands.map(p=>Math.round(p*100)),fa:Math.round(r.fa*100)};
+  save("profile");WD.test=null;render();
+}
+function cefr(n){return n<1500?"A1":n<2500?"A2":n<3250?"B1":n<3750?"B2":n<4500?"C1":"C2";}
+function recentWords(){return Object.values(state.cards).filter(c=>c.track==="dagelijks").sort((a,b)=>b.created-a.created).slice(0,8).map(c=>c.en);}
+function addWordCards(list){
+  const n=Date.now(),have=new Set(Object.values(state.cards).map(c=>String(c.en).toLowerCase()));let added=0;
+  list.forEach((x,i)=>{if(!x.en||have.has(String(x.en).toLowerCase()))return;state.cards["e"+n+"_"+i]={nl:String(x.nl||""),en:String(x.en),ex:String(x.ex||""),src:"eigen",track:"dagelijks",due:n,created:n};added++;});
+  save("deck");return added;
+}
+function readingHTML(r){
+  let html=esc(r.text);
+  (r.glossary||[]).map((g,i)=>[g,i]).sort((a,b)=>String(b[0].en).length-String(a[0].en).length).forEach(([g,i])=>{
+    const term=esc(g.en).replace(/[.*+?^${}()|[\]\\]/g,"\\$&");if(!term)return;
+    const re=new RegExp(`(^|[^\\w>])(${term})(?![\\w<])`,"i");
+    html=html.replace(re,(m0,pre,word)=>`${pre}<mark class="gl${WD.readSel[i]?" sel":""}" data-gi="${i}">${word}</mark>`);
+  });
+  return html.split(/\n\s*\n/).map(p=>`<p>${p.replace(/\n/g,"<br>")}</p>`).join("");
+}
+const sentenceWith=(text,term)=>{const ss=String(text).split(/(?<=[.!?])\s+/);return ss.find(s=>s.toLowerCase().includes(String(term).toLowerCase()))||"";};
+function renderWords(m){
+  const v=vocab();
+  if(WD.test){
+    const t=WD.test,x=t.items[t.idx],pct=t.idx/t.items.length*100;
+    m.innerHTML=`<div class="view">
+      <div class="spread"><button class="btn link" id="stopTest">${icon("back")} Stoppen</button><span class="small muted mono">${t.idx+1} / ${t.items.length}</span></div>
+      <div class="stepper" style="grid-template-columns:1fr"><div class="cur"><i><u style="width:${pct}%"></u></i></div></div>
+      <section class="glass pad stack"><p class="eyebrow" style="text-align:center">Ken je dit woord? Je hoeft maar één betekenis te kennen.</p><div class="testword">${esc(x.w)}</div></section>
+      <div class="yn"><button class="btn ghost big" data-yn="0">Ken ik niet <span class="mono small muted">N</span></button><button class="btn primary big" data-yn="1">Ken ik <span class="mono small">J</span></button></div>
+      <p class="small muted" style="text-align:center">Er zitten een paar nepwoorden tussen. Zo corrigeert de test voor gokken.</p>
+    </div>`;
+    const ans=y=>{t.yes[t.idx]=y;t.idx++;if(t.idx>=t.items.length)finishTest();else renderWords(m);};
+    m.querySelectorAll("[data-yn]").forEach(b=>b.onclick=()=>ans(b.dataset.yn==="1"));
+    document.onkeydown=e=>{if(!WD.test||route!=="woorden"||view)return;const k=e.key.toLowerCase();if(k==="j"||k==="y"||k==="arrowright")ans(true);if(k==="n"||k==="arrowleft")ans(false);};
+    $("#stopTest").onclick=()=>{WD.test=null;render();};
+    return;
+  }
+  const learning=Object.values(state.cards).filter(c=>c.track==="dagelijks"),solid=learning.filter(c=>c.s>=21).length;
+  const T0=v.test;
+  const r=WD.read;
+  m.innerHTML=`<div class="view">
+    ${noticeHTML()}
+    <div><p class="eyebrow">Dagelijks Engels</p><h1>Woorden</h1><p class="muted" style="margin-top:8px;max-width:62ch">Je leert de woorden die in gewone gesprekken het vaakst voorkomen, te beginnen bij jouw niveau. Nieuwe woorden komen elke dag in je sessie Dagelijks Engels. Hier kun je ook woorden uit je eigen teksten toevoegen of iets lezen.</p></div>
+    <section class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
+      <div class="glass kpi"><span class="eyebrow">Woordenschat</span><b>${T0?"±"+fmtNum(T0.size):"?"}</b><span class="small muted">${T0?"indicatie "+cefr(T0.size):"doe de test hieronder"}</span></div>
+      <div class="glass kpi"><span class="eyebrow">Aan het leren</span><b>${learning.length}</b><span class="small muted">${solid} zitten goed vast</span></div>
+      <div class="glass kpi"><span class="eyebrow">In de lijst</span><b>${fmtNum(v.next)}</b><span class="small muted">van ${fmtNum(WORDS.length)} woorden</span></div>
+    </section>
+    <section class="glass pad stack">
+      <div class="spread"><div><h3>Woordenschattest</h3><p class="small muted">${T0?`Gedaan op ${new Date(T0.date).toLocaleDateString("nl-NL",{day:"numeric",month:"long"})}. Zo ver ken je de woorden, per 1.000 meest gebruikte:`:"± 4 minuten. Je ziet 73 woorden en zegt of je ze kent. Daarna weet de app bij welk woord je begint."}</p></div>
+      <button class="btn ${T0?"ghost":"primary"}" id="startTest">${icon("play")} ${T0?"Opnieuw doen":"Start de test"}</button></div>
+      ${T0?`<div class="bandchart">${T0.bands.map((p,i)=>`<div><span>${p}%</span><i style="height:${Math.max(3,p)}%;${p<80?"background:linear-gradient(180deg,var(--amber),var(--amber-soft))":""}"></i><span>${i+1}k</span></div>`).join("")}</div>
+      <p class="small muted">Oranje: hier zit je groei. Je nieuwe woorden beginnen bij woord ${fmtNum(v.next)}.${T0.fa>20?" Let op: je zei 'ken ik' bij een paar nepwoorden. De schatting is daarvoor gecorrigeerd.":""} Het niveau is een grove indicatie (Milton & Alexiou, 2009).</p>`:""}
+    </section>
+    <div class="two">
+      <section class="glass pad stack">
+        <div><h3>Woorden uit je eigen tekst</h3><p class="small muted">Plak een stuk tekst, een artikel, ondertitels of gewoon een lijstje woorden die je niet kende. Claude maakt er kaarten van.</p></div>
+        <textarea id="pasteIn" style="min-height:120px" placeholder="Bijv. een alinea uit een nieuwsartikel of: reluctant, to bargain, nevertheless">${esc(WD.paste)}</textarea>
+        ${WD.pasteErr?errHTML(WD.pasteErr):""}
+        <div class="row" style="justify-content:flex-end"><button class="btn teal" id="pasteGo" ${!sample||WD.pasteLoading?"disabled":""}>${WD.pasteLoading?'<span class="loading-dots">Claude zoekt woorden</span>':icon("spark")+" Maak kaarten"}</button></div>
+        ${WD.pasteItems?`<div class="gl-list">${WD.pasteItems.map((x,i)=>`<label class="gl-item"><input type="checkbox" data-ps="${i}" ${WD.pasteSel[i]!==false?"checked":""}><span><b>${esc(x.en)}</b><br><span class="small muted">${esc(x.nl)}</span></span></label>`).join("")}</div>
+          <div class="row" style="justify-content:flex-end"><button class="btn primary" id="pasteAdd">Voeg toe aan kaarten</button></div>`:""}
+        ${needClaude()}
+      </section>
+      <section class="glass pad stack">
+        <div><h3>Leesstuk</h3><p class="small muted">Een korte tekst op jouw niveau over een willekeurig onderwerp, met woorden die je aan het leren bent. Klik op gemarkeerde woorden om ze te bewaren.</p></div>
+        ${WD.readErr?errHTML(WD.readErr):""}
+        <div class="row"><button class="btn ${r?"ghost":"primary"}" id="readGo" ${!sample||WD.readLoading?"disabled":""}>${WD.readLoading?'<span class="loading-dots">Claude schrijft</span>':icon("spark")+(r?" Nieuw leesstuk":" Maak een leesstuk")}</button><span class="small muted">± 5 min</span></div>
+        ${needClaude()}
+      </section>
+    </div>
+    ${r?`<section class="glass pad stack" id="readBox">
+      <div class="spread"><div><p class="eyebrow">${esc(r.topic||"")}</p><h2>${esc(r.title)}</h2></div><div class="row"><button class="btn ghost" id="readSay">${icon("sound")} Voorlezen</button><button class="btn link" id="readStop">Stop</button></div></div>
+      <div class="reading">${readingHTML(r)}</div>
+      <div class="eyebrow">Woorden uit de tekst</div>
+      <div class="gl-list">${(r.glossary||[]).map((g,i)=>`<label class="gl-item"><input type="checkbox" data-rs="${i}" ${WD.readSel[i]?"checked":""}><span><b>${esc(g.en)}</b><br><span class="small muted">${esc(g.nl)}</span></span></label>`).join("")}</div>
+      <div class="row" style="justify-content:flex-end"><button class="btn ghost" id="readDone">Klaar met lezen</button><button class="btn primary" id="readAdd">Bewaar aangevinkte woorden</button></div>
+    </section>`:""}
+  </div>`;
+  $("#startTest").onclick=()=>{WD.test=buildTest();render();window.scrollTo({top:0});};
+  $("#pasteIn").oninput=e=>WD.paste=e.target.value;
+  $("#pasteGo").onclick=async()=>{
+    const txt=WD.paste.trim();if(txt.length<3){$("#pasteIn").focus();return;}
+    WD.pasteLoading=true;WD.pasteErr="";WD.pasteItems=null;render();
+    try{const res=await sample.json(`A Dutch adult learning English (level B1-B2) pasted the input below.
+If it is a list of words or phrases, make a card for each item. If it is a running text, pick the 6 to 12 words or expressions that are most likely new for a B1-B2 learner and worth learning (skip names).
+For each item: "en" = the base form or expression, "nl" = short Dutch translation, "ex" = the sentence from the text where it appears (shortened if long), or a natural example sentence for a list item.
+Input:
+"""
+${txt.slice(0,6000)}
+"""
+Respond ONLY with JSON: {"items":[{"en":string,"nl":string,"ex":string}]}`,{modelTier:"default"});
+      WD.pasteItems=(res.items||[]).filter(x=>x&&x.en).slice(0,20);WD.pasteSel={};}
+    catch(e){WD.pasteErr=sampleError(e);}
+    WD.pasteLoading=false;render();
+  };
+  m.querySelectorAll("[data-ps]").forEach(c=>c.onchange=()=>{WD.pasteSel[c.dataset.ps]=c.checked;});
+  const pa=$("#pasteAdd");if(pa)pa.onclick=()=>{const n=addWordCards(WD.pasteItems.filter((x,i)=>WD.pasteSel[i]!==false));WD.pasteItems=null;WD.paste="";render();toast(n+" kaarten toegevoegd aan Dagelijks Engels.");};
+  $("#readGo").onclick=async()=>{
+    const topic=READ_TOPICS[Math.floor(Math.random()*READ_TOPICS.length)],rw=recentWords();
+    WD.readLoading=true;WD.readErr="";render();
+    try{const res=await sample.json(`Write a short, engaging English text (160 to 200 words) for a Dutch adult at B2 level. Topic (in Dutch): ${topic}. Use natural, everyday English and short paragraphs.${rw.length?` Where it fits naturally, use some of these words the learner is studying: ${rw.join(", ")}.`:""}
+Then list 8 to 12 words or expressions exactly as they appear in the text that could be new for a B2 learner, with a short Dutch translation.
+Respond ONLY with JSON: {"title":string,"text":string,"glossary":[{"en":string,"nl":string}]}`,{modelTier:"default"});
+      WD.read={...res,topic};WD.readSel={};WD.readStart=Date.now();}
+    catch(e){WD.readErr=sampleError(e);}
+    WD.readLoading=false;render();
+  };
+  if(r){
+    m.querySelectorAll("mark.gl").forEach(k=>k.onclick=()=>{const i=k.dataset.gi;WD.readSel[i]=!WD.readSel[i];render();});
+    m.querySelectorAll("[data-rs]").forEach(c=>c.onchange=()=>{WD.readSel[c.dataset.rs]=c.checked;render();});
+    $("#readSay").onclick=()=>say(r.text,.95);
+    $("#readStop").onclick=()=>{try{speechSynthesis.cancel();}catch(e){}};
+    $("#readAdd").onclick=()=>{const sel=(r.glossary||[]).filter((g,i)=>WD.readSel[i]).map(g=>({en:g.en,nl:g.nl,ex:sentenceWith(r.text,g.en)}));
+      if(!sel.length){toast("Vink eerst woorden aan of klik ze aan in de tekst.");return;}
+      const n=addWordCards(sel);WD.readSel={};render();toast(n+" woorden bewaard.");};
+    $("#readDone").onclick=()=>{const mins=Math.min(20,Math.max(1,Math.round((Date.now()-WD.readStart)/60000)));addMinutes(mins);WD.read=null;render();toast(mins+" min lezen genoteerd.");};
+  }
+}
+
 /* ================= Kaarten ================= */
-const KF={q:"",show:"alle"};
+const KF={q:"",show:"alle",track:"alle"};
 function renderCards(m){
   const all=Object.entries(state.cards),now=Date.now();
   const counts={alle:all.length,nu:all.filter(([,c])=>c.due<=now).length,vast:all.filter(([,c])=>c.s>=21).length,nieuw:all.filter(([,c])=>c.src==="feedback").length};
   const q=KF.q.toLowerCase();
-  const list=all.filter(([,c])=>(KF.show==="alle"||(KF.show==="nu"&&c.due<=now)||(KF.show==="vast"&&c.s>=21)||(KF.show==="nieuw"&&c.src==="feedback"))&&(!q||c.nl.toLowerCase().includes(q)||c.en.toLowerCase().includes(q))).sort((a,b)=>a[1].due-b[1].due);
+  const list=all.filter(([,c])=>(KF.track==="alle"||trackOf(c)===KF.track)&&(KF.show==="alle"||(KF.show==="nu"&&c.due<=now)||(KF.show==="vast"&&c.s>=21)||(KF.show==="nieuw"&&c.src==="feedback"))&&(!q||c.nl.toLowerCase().includes(q)||c.en.toLowerCase().includes(q))).sort((a,b)=>a[1].due-b[1].due);
   const when=c=>{const d=(c.due-now)/DAY;return d<=0?'<span class="chip amber">nu</span>':d<1?'<span class="chip line">vandaag</span>':`<span class="chip line">over ${fmtInt(Math.round(d))}</span>`;};
   const fb=(v,l)=>`<button data-show="${v}" aria-pressed="${KF.show===v}">${l} <span class="mono">${counts[v]}</span></button>`;
   m.innerHTML=`<div class="view">
     ${noticeHTML()}
     <div class="spread"><div><p class="eyebrow">Je persoonlijke woordenschat</p><h1>Kaarten</h1></div>${counts.nu?`<button class="btn primary" id="revNow">${icon("play")} Herhaal ${Math.min(counts.nu,12)} kaarten</button>`:""}</div>
     <p class="muted" style="max-width:62ch">Elke kaart komt terug net voordat je hem zou vergeten. Kaarten uit je feedback staan hier automatisch tussen.</p>
+    <div class="filters">${[["alle","Werk en dagelijks"],["werk","Werk"],["dagelijks","Dagelijks Engels"]].map(([v,l])=>`<button data-tr="${v}" aria-pressed="${KF.track===v}">${l}</button>`).join("")}</div>
     <div class="filters">${fb("alle","Alle")}${fb("nu","Nu herhalen")}${fb("nieuw","Uit feedback")}${fb("vast","Goed vast")}</div>
     <input type="text" id="kq" placeholder="Zoek in het Nederlands of Engels…" value="${esc(KF.q)}">
     <section class="glass tablewrap"><table><thead><tr><th>Nederlands</th><th>Engels</th><th>Terug</th><th><span class="sr" hidden>Verwijderen</span></th></tr></thead><tbody>
-      ${list.map(([id,c])=>`<tr><td>${esc(c.nl)}</td><td><b>${esc(c.en)}</b><div class="small muted">${esc(c.ex)}</div></td><td>${when(c)}</td><td><button class="del" data-del="${id}" aria-label="Verwijder kaart">✕</button></td></tr>`).join("")||'<tr><td colspan="4" class="muted">Geen kaarten gevonden.</td></tr>'}
+      ${list.map(([id,c])=>`<tr><td>${esc(c.nl)}</td><td><b>${esc(c.en)}</b> <span class="chip line" style="font-size:.68rem;padding:1px 7px">${trackOf(c)==="werk"?"werk":"dagelijks"}</span><div class="small muted">${esc(c.ex)}</div></td><td>${when(c)}</td><td><button class="del" data-del="${id}" aria-label="Verwijder kaart">✕</button></td></tr>`).join("")||'<tr><td colspan="4" class="muted">Geen kaarten gevonden.</td></tr>'}
     </tbody></table></section>
     <section class="glass pad stack"><h3>Zelf een kaart toevoegen</h3>
       <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr))">
@@ -942,7 +1263,8 @@ function renderCards(m){
       </div>
       <div class="row" style="justify-content:flex-end"><button class="btn teal" id="nAdd">Toevoegen</button></div></section>
   </div>`;
-  if($("#revNow"))$("#revNow").onclick=startSession;
+  if($("#revNow"))$("#revNow").onclick=()=>startSession(KF.track!=="alle"?KF.track:(due("werk").length>=due("dagelijks").length?"werk":"dagelijks"));
+  m.querySelectorAll("[data-tr]").forEach(b=>b.onclick=()=>{KF.track=b.dataset.tr;renderCards(m);});
   m.querySelectorAll("[data-show]").forEach(b=>b.onclick=()=>{KF.show=b.dataset.show;renderCards(m);});
   $("#kq").oninput=e=>{KF.q=e.target.value;const p=e.target.selectionStart;renderCards(m);const k=$("#kq");k.focus();k.setSelectionRange(p,p);};
   $("#nAdd").onclick=()=>{const nl=$("#nNl").value.trim(),en=$("#nEn").value.trim();if(!nl||!en){(!nl?$("#nNl"):$("#nEn")).focus();return;}
@@ -966,6 +1288,8 @@ function renderProgress(m){
       <div class="glass kpi"><span class="eyebrow">Totaal</span><b>${total}</b><span class="small muted">minuten geoefend</span></div>
       <div class="glass kpi"><span class="eyebrow">Geoefend</span><b>${cards.filter(c=>c.reps).length}</b><span class="small muted">van ${cards.length} kaarten</span></div>
       <div class="glass kpi"><span class="eyebrow">Goed vast</span><b>${cards.filter(c=>c.s>=21).length}</b><span class="small muted">3+ weken onthouden</span></div>
+      <div class="glass kpi"><span class="eyebrow">Woordenschat</span><b>${vocab().test?"±"+fmtNum(vocab().test.size):"?"}</b><span class="small muted">${vocab().test?"indicatie "+cefr(vocab().test.size):"nog geen test gedaan"}</span></div>
+      <div class="glass kpi"><span class="eyebrow">Werk / Dagelijks</span><b>${cards.filter(c=>trackOf(c)==="werk").length} / ${cards.filter(c=>trackOf(c)==="dagelijks").length}</b><span class="small muted">kaarten per spoor</span></div>
     </section>
     <section class="glass pad stack"><div class="spread"><h3>Minuten per dag</h3><span class="small muted">Doel: ${goal} min per dag</span></div>
       <div class="bars">${days.map(([l,v])=>`<div class="${v>=goal?"goal":""}"><span>${v||""}</span><i style="height:${v/max*100}%;${v>=goal?"background:linear-gradient(180deg,var(--amber),var(--amber-soft))":""}"></i><span>${l}</span></div>`).join("")}</div></section>
