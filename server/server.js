@@ -1,4 +1,4 @@
-// Werkengels lokale server: serveert de app en geeft hem toegang tot Claude en opslag op je eigen Mac.
+// Other Biscuit lokale server: serveert de app en geeft hem toegang tot Claude en opslag op je eigen Mac.
 // Geen npm-pakketten nodig, alleen Node.js.
 const http = require("http");
 const fs = require("fs");
@@ -9,7 +9,7 @@ const { spawn, execFileSync } = require("child_process");
 const ROOT = path.resolve(__dirname, "..");
 const PORT = Number(process.env.PORT || 4321);
 const DATA_DIR = path.join(ROOT, "data");
-const APP_FILE = path.join(ROOT, "app", "werkengels.html");
+const APP_FILE = path.join(ROOT, "app", "other-biscuit.html");
 const SHIM_FILE = path.join(ROOT, "web", "local-shim.js");
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -149,7 +149,7 @@ async function askClaude(input, tier) {
   if (!CLAUDE_BIN) CLAUDE_BIN = findClaude();
   if (CLAUDE_BIN) return runCli(toPrompt(input), tier);
   if (process.env.ANTHROPIC_API_KEY) return runApi(input, tier);
-  throw new Error("Claude Code is niet gevonden op deze Mac. Open Terminal en typ: which claude. Krijg je een pad terug? Zet dat in een bestand .env in de app-map als CLAUDE_BIN=/dat/pad en start Werkengels opnieuw. Krijg je niets terug? Dubbelklik dan op \"Claude Code installeren.command\".");
+  throw new Error("Claude Code is niet gevonden op deze Mac. Open Terminal en typ: which claude. Krijg je een pad terug? Zet dat in een bestand .env in de app-map als CLAUDE_BIN=/dat/pad en start Other Biscuit opnieuw. Krijg je niets terug? Dubbelklik dan op \"Other Biscuit starten.command\", die installeert Claude Code voor je.");
 }
 
 // ---------- HTTP ----------
@@ -168,7 +168,7 @@ function readBody(req) {
     req.on("error", reject);
   });
 }
-const FAVICON = `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0F766E"/><stop offset="1" stop-color="#B8650F"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#g)"/><text x="32" y="44" font-family="Arial" font-weight="700" font-size="34" fill="#fff" text-anchor="middle">W</text></svg>')}">`;
+const FAVICON = `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0F766E"/><stop offset="1" stop-color="#B8650F"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#g)"/><circle cx="32" cy="32" r="20" fill="none" stroke="#fff" stroke-width="5"/><g fill="#fff"><circle cx="25" cy="26" r="3"/><circle cx="39" cy="26" r="3"/><circle cx="32" cy="34" r="3"/><circle cx="24" cy="39" r="3"/><circle cx="40" cy="39" r="3"/></g></svg>')}">`;
 
 function page() {
   const app = fs.readFileSync(APP_FILE, "utf8");
@@ -208,6 +208,6 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, "127.0.0.1", () => {
-  console.log(`Werkengels draait op http://localhost:${PORT}`);
+  console.log(`Other Biscuit draait op http://localhost:${PORT}`);
   console.log(CLAUDE_BIN ? `Claude via Claude Code: ${CLAUDE_BIN}` : process.env.ANTHROPIC_API_KEY ? "Claude via API-sleutel" : "Let op: geen Claude gevonden, feedback werkt niet.");
 });

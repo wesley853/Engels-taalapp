@@ -1,12 +1,12 @@
 #!/bin/zsh
-# Dubbelklik om Werkengels te starten. Haalt automatisch de nieuwste versie op,
+# Dubbelklik om Other Biscuit te starten. Haalt automatisch de nieuwste versie op,
 # installeert Claude Code als dat nodig is, en opent de app in je browser.
 cd "$(dirname "$0")"
 source ~/.zshrc >/dev/null 2>&1
 export PATH="$PATH:/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$HOME/.claude/local"
 PORT=4321
 
-echo "Werkengels wordt gestart..."
+echo "Other Biscuit wordt gestart..."
 
 # 1. Nieuwste versie ophalen (stil, gaat door als er geen internet is)
 git pull --ff-only -q >/dev/null 2>&1
@@ -56,7 +56,7 @@ done
 
 if curl -s "http://localhost:$PORT/api/ping" >/dev/null 2>&1; then
   open "http://localhost:$PORT"
-  echo "Werkengels draait. Je kunt dit venster sluiten."
+  echo "Other Biscuit draait. Je kunt dit venster sluiten."
 else
   echo "Starten lukte niet. Stuur een screenshot van dit venster naar Claude:"
   tail -n 20 logs/server.log
