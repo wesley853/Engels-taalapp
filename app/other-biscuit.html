@@ -187,6 +187,29 @@ details summary{cursor:pointer;color:var(--teal);font-weight:600;font-size:.92re
 .bandchart{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;height:140px;align-items:end}
 .bandchart div{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;font:500 .72rem var(--f-mono);color:var(--muted)}
 .bandchart i{width:100%;max-width:40px;border-radius:7px 7px 3px 3px;background:linear-gradient(180deg,var(--teal),var(--teal-soft));transition:height .8s}
+.play-card{display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap;position:relative;overflow:hidden;border-color:var(--amber)}
+.play-card::after{content:"";position:absolute;right:-60px;bottom:-80px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,var(--glow2),transparent 70%);pointer-events:none}
+.play-card>.stack{max-width:56ch}
+.game .game-card{min-height:150px;justify-content:center}
+.gbar{height:10px;border-radius:5px;background:var(--line);overflow:hidden}
+.gbar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--teal),var(--amber));transition:width .4s cubic-bezier(.2,.8,.2,1)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{display:flex;align-items:center;gap:12px;text-align:left;padding:16px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;font-weight:600;font-size:1.02rem;transition:transform .12s,border-color .15s,background .15s}
+.opt:hover:not(:disabled){transform:translateY(-2px);border-color:var(--teal)}
+.opt .key{font:600 .75rem var(--f-mono);width:24px;height:24px;border-radius:7px;display:grid;place-items:center;border:1px solid var(--line);color:var(--muted);flex:none}
+.opt.right{background:var(--green-soft);border-color:var(--green);animation:bump .35s}
+@keyframes bump{50%{transform:scale(1.03)}}
+.opt.wrong{background:var(--red-soft);border-color:var(--red);animation:shake .35s}
+.opt:disabled{cursor:default}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.gap-sent{font-size:1.3rem;line-height:1.6;font-family:var(--f-display);font-weight:500}
+.blank{display:inline-block;min-width:90px;border-bottom:3px solid var(--amber);text-align:center;padding:0 6px;color:var(--teal);font-weight:700}
+.hl{color:var(--teal)}
+.speaker{width:96px;height:96px;border-radius:50%;border:0;cursor:pointer;background:linear-gradient(135deg,var(--teal),var(--amber));color:var(--solid);display:grid;place-items:center;box-shadow:0 10px 30px var(--glow1);transition:transform .15s}
+.speaker:hover{transform:scale(1.05)}.speaker svg{width:40px;height:40px}
+.feedback{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:16px 18px;border-radius:14px;animation:in .25s ease}
+.feedback.ok{background:var(--green-soft)}.feedback.no{background:var(--red-soft)}
+.chip.combo{animation:bump .4s}
 .toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:50;background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;box-shadow:var(--shadow);animation:in .3s ease}
 .resume-bar{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-color:var(--amber)}
 .verdict{font-size:.92rem;padding:8px 12px;border-radius:10px;background:var(--line);align-self:flex-start}
@@ -272,6 +295,7 @@ th{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mu
   .clock .lbl b{font-size:1.05rem}
   .hbar{grid-template-columns:110px 1fr 28px}
   .grade{grid-template-columns:repeat(2,1fr)}
+  .opts{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
@@ -495,7 +519,7 @@ function save(which,now){
 }
 /* Waar je gebleven was: sessie en opdracht worden na elke stap bewaard */
 function resumeBody(){
-  const ser=s=>s.active?{track:s.track,date:s.date,phase:s.phase,queue:s.queue,idx:s.idx,flipped:s.flipped,input:s.input,text:s.text,fb:s.fb,reviewed:s.reviewed,added:s.added,newWords:s.newWords,newIdx:s.newIdx,learned:s.learned,elapsed:Math.round((Date.now()-s.start)/1000)}:null;
+  const ser=s=>s.active?{track:s.track,date:s.date,phase:s.phase,queue:s.queue,idx:s.idx,flipped:s.flipped,input:s.input,text:s.text,fb:s.fb,reviewed:s.reviewed,added:s.added,newWords:s.newWords,newIdx:s.newIdx,learned:s.learned,game:s.game,elapsed:Math.round((Date.now()-s.start)/1000)}:null;
   return {date:today(),view,cur:S.track,SS:{werk:ser(SESS.werk),dagelijks:ser(SESS.dagelijks)},
     T:T.active?{t:T.t,elapsed:taskElapsed(),text:T.text,fb:T.fb,chat:T.chat,checked:T.checked}:null};
 }
@@ -700,9 +724,9 @@ function greet(){const h=new Date().getHours();return h<12?"Goedemorgen":h<18?"G
 function sessionCard(tr){
   const s=SESS[tr],done=sessionDone(tr),t=dailyTask(tr),dc=due(tr).length;
   const plan=tr==="werk"?[`${Math.min(dc,REVIEW_LIMIT)} kaarten herhalen`,`${TYPE_LABEL[t.type]}: ${esc(t.title)}`,"Feedback van Claude"]
-    :[`${Math.min(dc,DAILY_REVIEW_LIMIT)} kaarten herhalen`,`${NEW_PER_SESSION} nieuwe woorden`,`${TYPE_LABEL[t.type]}: ${esc(t.title)}`];
+    :[`${Math.min(dc,DAILY_REVIEW_LIMIT)} kaarten herhalen`,`Woordspel: ${NEW_PER_SESSION} nieuwe woorden`,`${TYPE_LABEL[t.type]}: ${esc(t.title)}`];
   return `<section class="glass session-card ${tr}">
-    <div class="spread"><span class="chip ${tr==="werk"?"":"amber"}">${TRACK_LABEL[tr]}</span>${done?`<span class="chip green">${icon("check")} Gedaan</span>`:`<span class="small muted mono">± 8 min</span>`}</div>
+    <div class="spread"><span class="chip ${tr==="werk"?"":"amber"}">${TRACK_LABEL[tr]}</span>${done?`<span class="chip green">${icon("check")} Gedaan</span>`:`<span class="small muted mono">± ${tr==="werk"?8:10} min</span>`}</div>
     <h2>${s.active?"Je was bezig":done?"Klaar voor vandaag":esc(t.title)}</h2>
     <ul class="plan-list">${plan.map(p=>`<li>${p}</li>`).join("")}</ul>
     <div class="row" style="margin-top:auto">${s.active?`<button class="btn primary" data-cont="${tr}">${icon("play")} Ga verder</button><button class="btn link" data-start="${tr}">Opnieuw beginnen</button>`
@@ -750,8 +774,8 @@ function renderHome(m){
 /* ================= Dagelijkse sessies: Werk en Dagelijks Engels ================= */
 const REVIEW_LIMIT=12,DAILY_REVIEW_LIMIT=10,NEW_PER_SESSION=5;
 const TRACK_LABEL={werk:"Werk",dagelijks:"Dagelijks Engels"};
-const PHASES={werk:[["review","Herhalen",3],["task","Opdracht",4],["fb","Feedback",1]],dagelijks:[["review","Herhalen",2],["new","Nieuwe woorden",2],["task","Opdracht",3],["fb","Feedback",1]]};
-const newS=tr=>({track:tr,active:false,date:"",phase:"review",queue:[],idx:0,flipped:false,input:"",text:"",fb:null,loading:false,err:"",start:0,reviewed:0,added:0,newWords:null,newIdx:0,learned:[],newErr:""});
+const PHASES={werk:[["review","Herhalen",3],["task","Opdracht",4],["fb","Feedback",1]],dagelijks:[["review","Herhalen",2],["new","Woordspel",4],["task","Opdracht",3],["fb","Feedback",1]]};
+const newS=tr=>({track:tr,active:false,date:"",phase:"review",queue:[],idx:0,flipped:false,input:"",text:"",fb:null,loading:false,err:"",start:0,reviewed:0,added:0,newWords:null,newIdx:0,learned:[],newErr:"",game:null});
 const SESS={werk:newS("werk"),dagelijks:newS("dagelijks")};
 let S=SESS.werk;
 function startSession(tr){
@@ -780,22 +804,29 @@ async function loadNewWords(){
 /* Volgende woorden uit de frequentielijst die je nog niet kent en nog niet leert */
 async function fetchWords(n){
   const v=vocab(),have=new Set(Object.values(state.cards).map(c=>String(c.en).toLowerCase()));
-  const pick=[];let i=v.next;
-  while(pick.length<n+3&&i<WORDS.length){const w=WORDS[i++];if(!v.known[w]&&!have.has(w))pick.push(w);}
+  const ok=w=>!v.known[w]&&!have.has(w);
+  v.queue=(v.queue||[]).filter(ok);
+  const pick=v.queue.slice(0,n+3),fromQueue=new Set(pick);let i=v.next;
+  while(pick.length<n+3&&i<WORDS.length){const w=WORDS[i++];if(ok(w)&&!fromQueue.has(w))pick.push(w);}
   if(!pick.length)return [];
   const r=await sample.json(`You help a Dutch adult (level B1-B2) learn everyday English words. For each word below give:
 "nl" = the most common Dutch translation (short, max 4 words; add "(ww)" for a verb or "(bn)" for an adjective when the word could be read several ways),
 "ex" = one natural everyday example sentence (max 14 words) that uses the word,
+"form" = the exact form of the word as it appears in "ex",
+"gap" = the same sentence with that form replaced by "___",
+"wrong" = 3 Dutch words of the same word type that are clearly wrong but plausible to someone who does not know the word,
 "skip" = true if the word is a name, an interjection, offensive, or not useful to learn.
 Words: ${pick.join(", ")}
-Respond ONLY with JSON: {"words":[{"en":string,"nl":string,"ex":string,"skip":boolean}]}`,{modelTier:"quick"});
+Respond ONLY with JSON: {"words":[{"en":string,"nl":string,"ex":string,"form":string,"gap":string,"wrong":[string,string,string],"skip":boolean}]}`,{modelTier:"quick"});
   const byEn={};(r.words||[]).forEach(x=>{if(x&&x.en)byEn[String(x.en).toLowerCase()]=x;});
   const out=[];let last=null;
   for(const w of pick){
     if(out.length>=n)break;
-    const x=byEn[w];last=w;
+    const x=byEn[w];
+    if(fromQueue.has(w))v.queue=v.queue.filter(q=>q!==w);else last=w;
     if(!x||x.skip||!x.nl){v.known[w]=2;continue;}
-    out.push({en:w,nl:String(x.nl),ex:String(x.ex||"")});
+    const gap=String(x.gap||"");
+    out.push({en:w,nl:String(x.nl),ex:String(x.ex||""),form:String(x.form||w),gap:/_{2,}/.test(gap)?gap:"",wrong:Array.isArray(x.wrong)?x.wrong.map(String).filter(Boolean).slice(0,3):[]});
   }
   if(last)v.next=Math.max(v.next,WORDS.indexOf(last)+1);
   save("profile");
@@ -827,21 +858,13 @@ function renderSession(m){
     :`<div class="row"><button class="btn teal" id="flip">Toon antwoord</button><span class="small muted">Of druk op Enter</span></div>`}`;
   }else if(S.phase==="new"){
     if(!S.newWords){
-      body=`<div class="glass pad stack" style="align-items:flex-start">${S.newErr?errHTML(S.newErr)+`<div class="row"><button class="btn teal" id="retryNew">Opnieuw proberen</button><button class="btn link" id="skipNew">Sla nieuwe woorden over →</button></div>`
-        :`<p class="loading-dots">Claude zoekt je nieuwe woorden</p><button class="btn link" id="skipNew">Sla nieuwe woorden over →</button>`}</div>`;
-    }else if(S.newIdx>=S.newWords.length){
-      if(S.learned.length){S.phase="recall";S.queue=S.learned.slice();S.idx=0;S.flipped=false;S.input="";}else nextPhase();
-      return renderSession(m);
-    }else{
-      const w=S.newWords[S.newIdx];
-      body=`<div class="spread"><span class="eyebrow">Nieuw woord ${S.newIdx+1} van ${S.newWords.length}</span><button class="btn link" id="skipNew">Sla nieuwe woorden over →</button></div>
-      <section class="glass pad stack newword">
-        <div class="spread"><span class="word-en">${esc(w.en)}</span><button class="btn ghost" id="sayNew">${icon("sound")} Luister</button></div>
-        <div class="word-nl">${esc(w.nl)}</div>
-        <p class="muted" style="font-size:1.05rem">${esc(w.ex)}</p>
-      </section>
-      <div class="row"><button class="btn ghost big" id="knowIt">Ken ik al</button><button class="btn primary big" id="learnIt">Leer dit woord</button></div>
-      <p class="small muted">Woorden die je kiest om te leren, oefen je meteen daarna door ze zelf te typen. "Ken ik al" slaat het woord voortaan over.</p>`;
+      body=`<div class="glass pad stack" style="align-items:flex-start">${S.newErr?errHTML(S.newErr)+`<div class="row"><button class="btn teal" id="retryNew">Opnieuw proberen</button><button class="btn link" id="skipNew">Sla het woordspel over →</button></div>`
+        :`<p class="loading-dots">Claude zet je nieuwe woorden klaar</p><button class="btn link" id="skipNew">Sla het woordspel over →</button>`}</div>`;
+    }else if(!S.newWords.length){nextPhase();return renderSession(m);}
+    else{
+      if(!S.game)S.game=buildGame(S.newWords,"sessie");
+      return renderGame(m,S.game,{exitLabel:"Later verder",doneLabel:"Verder naar de opdracht",
+        onExit:()=>{view=null;render();},onDone:()=>{S.game=null;S.newWords=[];nextPhase();render();}});
     }
   }else if(S.phase==="task"){
     body=`<div class="glass pad stack">
@@ -881,16 +904,8 @@ function renderSession(m){
       S.reviewed++;S.idx++;S.flipped=false;S.input="";if(S.idx>=S.queue.length)nextPhase();render();});
   }
   if(S.phase==="new"){
-    const sk=$("#skipNew");if(sk)sk.onclick=()=>{S.newWords=S.newWords||[];S.newIdx=S.newWords.length;render();};
+    const sk=$("#skipNew");if(sk)sk.onclick=()=>{S.newWords=[];S.game=null;nextPhase();render();};
     const rt=$("#retryNew");if(rt)rt.onclick=()=>loadNewWords();
-    const w=S.newWords&&S.newWords[S.newIdx];
-    if(w){
-      $("#sayNew").onclick=()=>say(w.en);
-      $("#knowIt").onclick=()=>{vocab().known[w.en]=1;save("profile");S.newIdx++;render();};
-      $("#learnIt").onclick=()=>{const n=Date.now(),id="w"+n+"_"+S.newIdx;
-        state.cards[id]={nl:w.nl,en:w.en,ex:w.ex,src:"woord",track:"dagelijks",due:n,created:n};save("deck");
-        S.learned.push(id);S.added++;S.newIdx++;render();};
-    }
   }
   if(S.phase==="task"){
     const ta=$("#dText");ta.oninput=()=>{S.text=ta.value;$("#wc").textContent=wc(ta.value)+" woorden";save("resume");};
@@ -1091,33 +1106,224 @@ document.addEventListener("click",async e=>{
   }
 });
 
+/* ================= Woordspel: elk nieuw woord doorloopt 5 oefeningen, van kennismaken tot zelf typen ================= */
+const GAME_WORDS=6;
+const STEP_LABEL={intro:"Nieuw woord",mc:"Wat betekent dit?",gap:"Welk woord past in de zin?",listen:"Luister. Wat betekent het?",type:"Typ het in het Engels"};
+function nlPool(words,skip){
+  const own=words.filter((w,i)=>i!==skip).map(w=>w.nl);
+  const deck=shuffle(Object.values(state.cards).filter(c=>c.track==="dagelijks"&&c.nl.length<30).map(c=>c.nl)).slice(0,12);
+  return [...own,...deck];
+}
+function formPool(words,skip){
+  const own=words.filter((w,i)=>i!==skip).map(w=>w.form||w.en);
+  const v=vocab(),near=WORDS.slice(Math.max(0,v.next-600),v.next+600);
+  return [...own,...shuffle(near.slice()).slice(0,10)];
+}
+function pickOpts(correct,pool){
+  const out=[correct],seen=new Set([String(correct).toLowerCase()]);
+  for(const x of shuffle(pool.slice())){const k=String(x).toLowerCase();if(!seen.has(k)){seen.add(k);out.push(x);}if(out.length>=4)break;}
+  return shuffle(out);
+}
+function makeOpts(s,words){
+  const w=words[s.w];
+  if(s.t==="mc"||s.t==="listen"){
+    const own=(w.wrong||[]).filter(x=>x.toLowerCase()!==w.nl.toLowerCase());
+    if(own.length>=3)return shuffle([w.nl,...own.slice(0,3)]);
+    return pickOpts(w.nl,[...own,...nlPool(words,s.w)]);
+  }
+  if(s.t==="gap")return pickOpts(w.form||w.en,formPool(words,s.w));
+  return null;
+}
+function buildGame(words,source){
+  const n=words.length,steps=[];
+  words.forEach((w,i)=>{steps.push({t:"intro",w:i},{t:"mc",w:i});if(i>=1&&words[i-1].gap)steps.push({t:"gap",w:i-1});});
+  if(words[n-1].gap)steps.push({t:"gap",w:n-1});
+  steps.push(...shuffle(words.map((w,i)=>({t:"listen",w:i}))));
+  steps.push(...shuffle(words.map((w,i)=>({t:"type",w:i}))));
+  steps.forEach(s=>s.opts=makeOpts(s,words));
+  return {words,steps,i:0,xp:0,combo:0,best:0,correct:0,total:0,errors:{},known:{},answered:null,input:"",hint:false,done:false,source,start:Date.now(),summary:null};
+}
+const gameStep=g=>g.steps[g.i];
+function gameAdvance(g){
+  g.answered=null;g.input="";g.hint=false;g.i++;
+  while(g.i<g.steps.length&&g.known[g.steps[g.i].w]&&!g.steps[g.i].proof)g.i++;
+  if(g.i>=g.steps.length)finishGame(g);
+}
+function gameAnswer(g,ok,info){
+  const s=gameStep(g);
+  g.answered=Object.assign({ok},info||{});
+  if(s.t!=="intro"){g.total++;}
+  if(ok){
+    g.correct++;g.combo++;g.best=Math.max(g.best,g.combo);
+    g.xp+=10+(g.combo>=3?5:0)+(s.proof?10:0);
+    if(s.proof)g.known[s.w]=true;
+    beep(true);
+  }else{
+    g.combo=0;g.errors[s.w]=(g.errors[s.w]||0)+1;beep(false);
+    if(!s.proof){const again={t:s.t==="type"?"type":"mc",w:s.w,retry:true};again.opts=makeOpts(again,g.words);g.steps.splice(Math.min(g.steps.length,g.i+3),0,again);}
+  }
+}
+function finishGame(g){
+  if(g.done)return;g.done=true;
+  const now=Date.now(),v=vocab(),learned=[],known=[];
+  g.words.forEach((w,i)=>{
+    if(g.known[i]){v.known[w.en]=1;known.push(w);return;}
+    const id="w"+now+"_"+i,e=g.errors[i]||0;
+    state.cards[id]=review({nl:w.nl,en:w.en,ex:w.ex,src:"woord",track:"dagelijks",due:now,created:now},e===0?3:e===1?2:1,now);
+    learned.push(w);
+  });
+  state.profile.xp=(state.profile.xp||0)+g.xp;
+  if(g.source==="los")addMinutes(Math.min(20,Math.max(1,Math.round((now-g.start)/60000))));
+  save("deck");save("profile");
+  g.summary={learned,known,acc:g.total?Math.round(g.correct/g.total*100):100};
+}
+/* Geluidjes (uit te zetten) */
+let actx=null;
+const soundOn=()=>{try{return localStorage.getItem("we_sound")!=="0";}catch(e){return true;}};
+function beep(ok){
+  if(!soundOn())return;
+  try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const t0=actx.currentTime;
+    (ok?[660,990]:[260,200]).forEach((f,i)=>{const o=actx.createOscillator(),gn=actx.createGain(),t=t0+i*.09;
+      o.type=ok?"sine":"triangle";o.frequency.value=f;gn.gain.setValueAtTime(.0001,t);gn.gain.exponentialRampToValueAtTime(.14,t+.02);gn.gain.exponentialRampToValueAtTime(.0001,t+.2);
+      o.connect(gn).connect(actx.destination);o.start(t);o.stop(t+.22);});}catch(e){}
+}
+const boldWord=(ex,w)=>{const s=esc(ex),f=esc(w.form||w.en);const re=new RegExp(f.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"i");return re.test(s)?s.replace(re,m=>`<b class="hl">${m}</b>`):s;};
+function renderGame(m,g,o){
+  /* o = {title, onExit, onDone, doneLabel} */
+  if(g.summary){
+    const sm=g.summary;
+    m.innerHTML=`<div class="view"><div class="glass celebrate" id="cele"><div class="badge">${icon("spark")}</div><h1>+${g.xp} XP</h1>
+      <p class="muted">${sm.acc}% goed · beste combo ${g.best}</p>
+      ${sm.learned.length?`<div class="stack" style="gap:8px;width:100%;max-width:520px;text-align:left"><span class="eyebrow">Nieuw in je kaarten</span><div class="gl-list">${sm.learned.map(w=>`<div class="gl-item"><span><b>${esc(w.en)}</b><br><span class="small muted">${esc(w.nl)}</span></span></div>`).join("")}</div></div>`:""}
+      ${sm.known.length?`<p class="small muted">Al bekend: ${sm.known.map(w=>esc(w.en)).join(", ")}</p>`:""}
+      <p class="small muted">De nieuwe woorden komen terug in je herhaling, net voordat je ze zou vergeten.</p>
+      <div class="row" style="justify-content:center;margin-top:8px">${o.extra||""}<button class="btn primary" id="gDone">${o.doneLabel||"Klaar"}</button></div></div></div>`;
+    $("#gDone").onclick=o.onDone;const ex=$("#gAgain");if(ex&&o.onAgain)ex.onclick=o.onAgain;
+    return;
+  }
+  const s=gameStep(g),w=g.words[s.w],a=g.answered,pct=g.i/g.steps.length*100;
+  let body="";
+  const optBtns=(opts,correct)=>`<div class="opts">${opts.map((x,i)=>{
+      let cls="";if(a){if(String(x)===String(correct))cls="right";else if(a.chosen===i)cls="wrong";}
+      return `<button class="opt ${cls}" data-o="${i}" ${a?"disabled":""}><span class="key">${i+1}</span>${esc(x)}</button>`;}).join("")}</div>`;
+  if(s.t==="intro"){
+    body=`<section class="glass pad stack game-card">
+      <div class="spread"><span class="word-en">${esc(w.en)}</span><button class="btn ghost" id="gSay">${icon("sound")} Luister</button></div>
+      <div class="word-nl">${esc(w.nl)}</div>
+      <p class="muted" style="font-size:1.08rem">${boldWord(w.ex,w)}</p>
+    </section>
+    <div class="row"><button class="btn ghost big" id="gKnow">Ken ik al</button><button class="btn primary big" id="gNext">Volgende <span class="mono small">Enter</span></button></div>
+    <p class="small muted">Ken je hem al? Dan typ je hem meteen. Goed = woord overgeslagen en 10 XP extra.</p>`;
+  }else if(s.t==="mc"){
+    body=`<section class="glass pad stack game-card"><div class="spread"><span class="word-en">${esc(w.en)}</span><button class="btn ghost" id="gSay">${icon("sound")}</button></div></section>${optBtns(s.opts,w.nl)}`;
+  }else if(s.t==="gap"){
+    const sent=esc(w.gap||"").replace(/_{2,}/,'<span class="blank">'+(a?esc(w.form||w.en):"&nbsp;")+'</span>');
+    body=`<section class="glass pad stack game-card"><p class="gap-sent">${sent}</p></section>${optBtns(s.opts,w.form||w.en)}`;
+  }else if(s.t==="listen"){
+    body=`<section class="glass pad stack game-card" style="align-items:center"><button class="speaker" id="gSay" aria-label="Speel het woord af">${icon("sound")}</button>
+      ${a?`<span class="word-en">${esc(w.en)}</span>`:`<span class="small muted">Klik om opnieuw te luisteren</span>`}</section>${optBtns(s.opts,w.nl)}`;
+  }else{
+    const vd=a?verdictHTML(checkAnswer(g.input,w.en)):null;
+    body=`<section class="glass pad stack game-card">
+      ${s.proof?`<span class="chip amber">Bewijs dat je hem kent</span>`:""}
+      <div class="word-nl" style="font-size:1.6rem">${esc(w.nl)}</div>
+      ${w.gap&&!s.proof?`<p class="muted">${esc(w.gap).replace(/_{2,}/,'<span class="blank">'+(a?esc(w.form||w.en):(g.hint?esc((w.form||w.en)[0])+"…":"&nbsp;"))+'</span>')}</p>`:""}
+      <input type="text" id="gIn" placeholder="Typ het Engelse woord" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(g.input)}" ${a?"disabled":""}>
+      ${vd?`<p class="verdict ${vd.chip}">${vd.text}</p><p><b>${esc(w.en)}</b> <span class="muted">· ${esc(w.nl)}</span></p>`:""}
+    </section>
+    ${a?"":`<div class="row"><button class="btn link" id="gHint">Hint</button><button class="btn link" id="gIdk">Weet ik niet</button><button class="btn primary" id="gCheck" style="margin-left:auto">Controleer <span class="mono small">Enter</span></button></div>`}`;
+  }
+  m.innerHTML=`<div class="view game">
+    <div class="spread"><button class="btn link" id="gExit">${icon("back")} ${o.exitLabel||"Stoppen"}</button>
+      <div class="row" style="gap:8px"><span class="chip ${g.combo>=3?"amber combo":"line"}">${icon("spark")} combo ${g.combo}</span><span class="chip">${g.xp} XP</span><button class="btn link" id="gSound" style="padding:0 4px">${soundOn()?"Geluid aan":"Geluid uit"}</button></div></div>
+    <div class="gbar"><i style="width:${pct}%"></i></div>
+    <p class="eyebrow">${STEP_LABEL[s.t]}${s.retry?" · nog een keer":""}</p>
+    ${body}
+    ${a&&s.t!=="intro"?`<div class="feedback ${a.ok?"ok":"no"}"><div><b>${a.ok?(g.combo>=3?`Goed! Combo ${g.combo}`:"Goed!"):"Niet goed"}</b>${!a.ok&&s.t!=="type"?`<span> Het juiste antwoord: <b>${esc(s.t==="gap"?(w.form||w.en):w.nl)}</b></span>`:""}</div><button class="btn ${a.ok?"teal":"primary"}" id="gCont">Doorgaan <span class="mono small">Enter</span></button></div>`:""}
+  </div>`;
+  const rerender=()=>renderGame(m,g,o);
+  const cont=()=>{gameAdvance(g);rerender();save("resume");if(g.summary)confetti();};
+  $("#gExit").onclick=o.onExit;
+  $("#gSound").onclick=()=>{try{localStorage.setItem("we_sound",soundOn()?"0":"1");}catch(e){}rerender();};
+  const sy=$("#gSay");if(sy)sy.onclick=()=>say(w.en);
+  if(s.t==="listen"&&!a)setTimeout(()=>say(w.en),150);
+  if(s.t==="intro"){
+    setTimeout(()=>say(w.en),150);
+    $("#gNext").onclick=cont;
+    $("#gKnow").onclick=()=>{g.steps.splice(g.i+1,0,{t:"type",w:s.w,proof:true,opts:null});cont();};
+  }
+  m.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{const i=+b.dataset.o,x=s.opts[i],correct=s.t==="gap"?(w.form||w.en):w.nl;
+    gameAnswer(g,String(x)===String(correct),{chosen:i});rerender();});
+  if(s.t==="type"&&!a){
+    const inp=$("#gIn");inp.focus({preventScroll:true});
+    const check=()=>{g.input=inp.value.trim();if(!g.input){inp.focus();return;}const r=checkAnswer(g.input,w.en);gameAnswer(g,["exact","typo","minor"].includes(r.level));rerender();};
+    inp.oninput=()=>g.input=inp.value;
+    inp.onkeydown=e=>{if(e.key==="Enter"){e.stopPropagation();check();}};
+    $("#gCheck").onclick=check;
+    $("#gHint").onclick=()=>{g.hint=true;g.input=inp.value;rerender();};
+    $("#gIdk").onclick=()=>{g.input="";gameAnswer(g,false);rerender();};
+  }
+  const gc=$("#gCont");if(gc)gc.onclick=cont;
+  m._gameKeys={cont,a:!!a,step:s};
+}
+function activeGameEl(){
+  if(view==="sessie"&&S.phase==="new"&&S.game&&!S.game.summary)return $("#main");
+  if(!view&&route==="woorden"&&WD.game&&!WD.game.summary)return $("#main");
+  return null;
+}
+document.addEventListener("keydown",e=>{
+  const el=activeGameEl();if(!el||!el._gameKeys)return;
+  if(e.target&&e.target.id==="gIn")return;
+  const k=el._gameKeys;
+  if(e.key==="Enter"){e.preventDefault();if(k.a||k.step.t==="intro")k.cont();return;}
+  if(!k.a&&["1","2","3","4"].includes(e.key)){const b=el.querySelector(`[data-o="${+e.key-1}"]`);b&&b.click();}
+});
+
 /* ================= Woorden ================= */
-const PSEUDO="grombet sprindle dacrent mollage fenderate plimsy trockle vintrous brastle cobbering snerl glomish prendable quintered flerrish drovish chandock wimbrel porrident strallow".split(" ");
 const READ_TOPICS=["reizen en vakantie","eten en koken","een opvallend nieuwsfeit","sport","technologie in het dagelijks leven","natuur en dieren","een stukje geschiedenis","psychologie en gewoontes","geld en sparen","films en series","muziek","gezondheid en slaap","wonen in de stad","een bekende uitvinding","werk en vrije tijd","vriendschap"];
-const WD={test:null,result:null,paste:"",pasteItems:null,pasteSel:{},pasteLoading:false,pasteErr:"",read:null,readLoading:false,readErr:"",readSel:{},readStart:0};
+const WD={game:null,gameLoading:false,gameErr:"",test:null,result:null,paste:"",pasteItems:null,pasteSel:{},pasteLoading:false,pasteErr:"",read:null,readLoading:false,readErr:"",readSel:{},readStart:0};
 const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
 function buildTest(){
   const items=[];
   for(let b=0;b<9;b++){const band=WORDS.slice(b*1000,b*1000+1000);shuffle(band.slice()).slice(0,7).forEach(w=>items.push({w,band:b}));}
-  shuffle(PSEUDO.slice()).slice(0,10).forEach(w=>items.push({w,band:-1}));
-  return {items:shuffle(items),idx:0,yes:[]};
+  return {items:shuffle(items),idx:0,res:[],loading:true,err:"",answered:null};
+}
+async function prepareTest(t){
+  try{
+    const r=await sample.json(`For each English word below give "nl" = its most common Dutch translation (max 4 words) and "wrong" = 3 Dutch words or short phrases of the same word type that are clearly wrong but plausible for someone who does not know the word. Words: ${t.items.map(x=>x.w).join(", ")}
+Respond ONLY with JSON: {"items":[{"en":string,"nl":string,"wrong":[string,string,string]}]}`,{modelTier:"quick"});
+    const by={};(r.items||[]).forEach(x=>{if(x&&x.en&&x.nl&&Array.isArray(x.wrong)&&x.wrong.length>=3)by[String(x.en).toLowerCase()]=x;});
+    t.items=t.items.filter(x=>by[x.w]).map(x=>({...x,nl:by[x.w].nl,opts:shuffle([by[x.w].nl,...by[x.w].wrong.slice(0,3)])}));
+    if(t.items.length<20)throw {message:"Te weinig woorden ontvangen"};
+  }catch(e){t.err=e&&e.code?sampleError(e):"De test kon niet worden klaargezet. Probeer het opnieuw.";}
+  t.loading=false;if(WD.test===t)render();
 }
 function scoreTest(t){
-  const fake=t.items.filter((x,i)=>x.band<0),fa=fake.filter(x=>t.yes[t.items.indexOf(x)]).length/fake.length;
   const bands=[];
   for(let b=0;b<9;b++){
-    const its=t.items.map((x,i)=>[x,i]).filter(([x])=>x.band===b),h=its.filter(([,i])=>t.yes[i]).length/its.length;
-    bands.push(fa>=1?0:Math.max(0,Math.min(1,(h-fa)/(1-fa))));
+    const its=t.items.map((x,i)=>[x,i]).filter(([x])=>x.band===b);if(!its.length){bands.push(0);continue;}
+    const c=its.filter(([,i])=>t.res[i]==="ok").length,w=its.filter(([,i])=>t.res[i]==="wrong").length;
+    bands.push(Math.max(0,Math.min(1,(c-w/3)/its.length)));
   }
   const size=bands.reduce((a,p)=>a+p*1000,0);
   let start=bands.findIndex(p=>p<.8);if(start<0)start=8;
-  return {size,bands,fa,start};
+  return {size,bands,start};
 }
 function finishTest(){
-  const r=scoreTest(WD.test),v=vocab();
-  WD.test.items.forEach((x,i)=>{if(x.band>=0&&WD.test.yes[i])v.known[x.w]=1;});
-  v.next=Math.max(400,r.start*1000);v.test={date:today(),size:Math.round(r.size),bands:r.bands.map(p=>Math.round(p*100)),fa:Math.round(r.fa*100)};
+  const t=WD.test,r=scoreTest(t),v=vocab();
+  const miss=[];
+  t.items.forEach((x,i)=>{if(t.res[i]==="ok")v.known[x.w]=1;else if(x.band>=Math.max(0,r.start-1))miss.push([x.band,x.w]);});
+  v.queue=[...new Set([...miss.sort((a,b)=>a[0]-b[0]).map(x=>x[1]),...(v.queue||[])])].slice(0,40);
+  v.next=Math.max(400,r.start*1000);v.test={date:today(),size:Math.round(r.size),bands:r.bands.map(p=>Math.round(p*100)),fa:0};
   save("profile");WD.test=null;render();
+  toast(miss.length?`${miss.length} woorden die je niet wist komen als eerste in je woordspel.`:"Test opgeslagen.");
+}
+async function startWordGame(){
+  if(!sample||WD.gameLoading)return;
+  WD.gameLoading=true;WD.gameErr="";render();
+  try{const words=await fetchWords(GAME_WORDS);if(!words.length)throw {message:"Geen nieuwe woorden meer gevonden."};WD.game=buildGame(words,"los");window.scrollTo({top:0});}
+  catch(e){WD.gameErr=e&&e.code?sampleError(e):(e&&e.message)||"Het woordspel kon niet starten.";}
+  WD.gameLoading=false;render();
 }
 function cefr(n){return n<1500?"A1":n<2500?"A2":n<3250?"B1":n<3750?"B2":n<4500?"C1":"C2";}
 function recentWords(){return Object.values(state.cards).filter(c=>c.track==="dagelijks").sort((a,b)=>b.created-a.created).slice(0,8).map(c=>c.en);}
@@ -1138,18 +1344,31 @@ function readingHTML(r){
 const sentenceWith=(text,term)=>{const ss=String(text).split(/(?<=[.!?])\s+/);return ss.find(s=>s.toLowerCase().includes(String(term).toLowerCase()))||"";};
 function renderWords(m){
   const v=vocab();
+  if(WD.game){
+    return renderGame(m,WD.game,{doneLabel:"Terug naar Woorden",extra:`<button class="btn ghost" id="gAgain">Nog een ronde</button>`,
+      onExit:()=>{WD.game=null;render();},onDone:()=>{WD.game=null;render();},onAgain:()=>{WD.game=null;startWordGame();}});
+  }
   if(WD.test){
-    const t=WD.test,x=t.items[t.idx],pct=t.idx/t.items.length*100;
-    m.innerHTML=`<div class="view">
+    const t=WD.test;
+    if(t.loading||t.err){
+      m.innerHTML=`<div class="view"><div class="spread"><button class="btn link" id="stopTest">${icon("back")} Stoppen</button></div>
+        <section class="glass pad stack" style="align-items:center;text-align:center">${t.err?errHTML(t.err):`<p class="loading-dots">Claude zet je test klaar</p><p class="small muted">63 woorden, van heel gewoon tot lastig. Kies steeds de juiste betekenis.</p>`}</section></div>`;
+      $("#stopTest").onclick=()=>{WD.test=null;render();};return;
+    }
+    const x=t.items[t.idx],pct=t.idx/t.items.length*100,a=t.answered;
+    m.innerHTML=`<div class="view game">
       <div class="spread"><button class="btn link" id="stopTest">${icon("back")} Stoppen</button><span class="small muted mono">${t.idx+1} / ${t.items.length}</span></div>
-      <div class="stepper" style="grid-template-columns:1fr"><div class="cur"><i><u style="width:${pct}%"></u></i></div></div>
-      <section class="glass pad stack"><p class="eyebrow" style="text-align:center">Ken je dit woord? Je hoeft maar één betekenis te kennen.</p><div class="testword">${esc(x.w)}</div></section>
-      <div class="yn"><button class="btn ghost big" data-yn="0">Ken ik niet <span class="mono small muted">N</span></button><button class="btn primary big" data-yn="1">Ken ik <span class="mono small">J</span></button></div>
-      <p class="small muted" style="text-align:center">Er zitten een paar nepwoorden tussen. Zo corrigeert de test voor gokken.</p>
+      <div class="gbar"><i style="width:${pct}%"></i></div>
+      <p class="eyebrow">Wat betekent dit woord?</p>
+      <section class="glass pad stack game-card" style="align-items:center"><div class="testword" style="padding:18px 10px">${esc(x.w)}</div></section>
+      <div class="opts">${x.opts.map((o,i)=>{let cls="";if(a){if(o===x.nl)cls="right";else if(a.chosen===i)cls="wrong";}return `<button class="opt ${cls}" data-t="${i}" ${a?"disabled":""}><span class="key">${i+1}</span>${esc(o)}</button>`;}).join("")}</div>
+      <div class="row" style="justify-content:center"><button class="btn link" id="tIdk" ${a?"disabled":""}>Weet ik niet <span class="mono small">0</span></button></div>
     </div>`;
-    const ans=y=>{t.yes[t.idx]=y;t.idx++;if(t.idx>=t.items.length)finishTest();else renderWords(m);};
-    m.querySelectorAll("[data-yn]").forEach(b=>b.onclick=()=>ans(b.dataset.yn==="1"));
-    document.onkeydown=e=>{if(!WD.test||route!=="woorden"||view)return;const k=e.key.toLowerCase();if(k==="j"||k==="y"||k==="arrowright")ans(true);if(k==="n"||k==="arrowleft")ans(false);};
+    const ans=(i)=>{if(t.answered)return;const ok=i>=0&&x.opts[i]===x.nl;t.res[t.idx]=i<0?"idk":ok?"ok":"wrong";t.answered={chosen:i};beep(ok);renderWords(m);
+      setTimeout(()=>{if(WD.test!==t)return;t.answered=null;t.idx++;if(t.idx>=t.items.length)finishTest();else renderWords(m);},ok?450:1100);};
+    m.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>ans(+b.dataset.t));
+    $("#tIdk").onclick=()=>ans(-1);
+    document.onkeydown=e=>{if(WD.test!==t||route!=="woorden"||view)return;if(["1","2","3","4"].includes(e.key))ans(+e.key-1);if(e.key==="0")ans(-1);};
     $("#stopTest").onclick=()=>{WD.test=null;render();};
     return;
   }
@@ -1158,17 +1377,24 @@ function renderWords(m){
   const r=WD.read;
   m.innerHTML=`<div class="view">
     ${noticeHTML()}
-    <div><p class="eyebrow">Dagelijks Engels</p><h1>Woorden</h1><p class="muted" style="margin-top:8px;max-width:62ch">Je leert de woorden die in gewone gesprekken het vaakst voorkomen, te beginnen bij jouw niveau. Nieuwe woorden komen elke dag in je sessie Dagelijks Engels. Hier kun je ook woorden uit je eigen teksten toevoegen of iets lezen.</p></div>
+    <div><p class="eyebrow">Dagelijks Engels</p><h1>Woorden</h1><p class="muted" style="margin-top:8px;max-width:62ch">Je leert de woorden die in gewone gesprekken het vaakst voorkomen, te beginnen bij jouw niveau. Speel een ronde wanneer je wilt; in je sessie Dagelijks Engels zit er ook elke dag een.</p></div>
     <section class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
       <div class="glass kpi"><span class="eyebrow">Woordenschat</span><b>${T0?"±"+fmtNum(T0.size):"?"}</b><span class="small muted">${T0?"indicatie "+cefr(T0.size):"doe de test hieronder"}</span></div>
       <div class="glass kpi"><span class="eyebrow">Aan het leren</span><b>${learning.length}</b><span class="small muted">${solid} zitten goed vast</span></div>
+      <div class="glass kpi"><span class="eyebrow">XP</span><b>${fmtNum(state.profile.xp||0)}</b><span class="small muted">uit woordspellen</span></div>
       <div class="glass kpi"><span class="eyebrow">In de lijst</span><b>${fmtNum(v.next)}</b><span class="small muted">van ${fmtNum(WORDS.length)} woorden</span></div>
     </section>
+    <section class="glass pad play-card">
+      <div class="stack" style="gap:6px"><span class="eyebrow">± 5 min · ${GAME_WORDS} nieuwe woorden</span><h2>Woordspel</h2>
+        <p class="muted">Elk woord oefen je op 5 manieren: kennismaken, betekenis kiezen, in een zin, luisteren en zelf typen. Met XP en combo's.${(v.queue||[]).length?` Je begint met ${Math.min(GAME_WORDS,v.queue.length)} woorden uit je test.`:""}</p>
+        ${WD.gameErr?errHTML(WD.gameErr):""}</div>
+      <button class="btn primary big" id="playGame" ${!sample||WD.gameLoading?"disabled":""}>${WD.gameLoading?'<span class="loading-dots">Woorden klaarzetten</span>':icon("play")+" Speel een ronde"}</button>
+    </section>
     <section class="glass pad stack">
-      <div class="spread"><div><h3>Woordenschattest</h3><p class="small muted">${T0?`Gedaan op ${new Date(T0.date).toLocaleDateString("nl-NL",{day:"numeric",month:"long"})}. Zo ver ken je de woorden, per 1.000 meest gebruikte:`:"± 4 minuten. Je ziet 73 woorden en zegt of je ze kent. Daarna weet de app bij welk woord je begint."}</p></div>
+      <div class="spread"><div><h3>Woordenschattest</h3><p class="small muted">${T0?`Gedaan op ${new Date(T0.date).toLocaleDateString("nl-NL",{day:"numeric",month:"long"})}. Zo ver ken je de woorden, per 1.000 meest gebruikte:`:"± 4 minuten. Je kiest bij 63 woorden de juiste betekenis. Daarna weet de app bij welk woord je begint, en de woorden die je niet wist komen als eerste in je woordspel."}</p></div>
       <button class="btn ${T0?"ghost":"primary"}" id="startTest">${icon("play")} ${T0?"Opnieuw doen":"Start de test"}</button></div>
       ${T0?`<div class="bandchart">${T0.bands.map((p,i)=>`<div><span>${p}%</span><i style="height:${Math.max(3,p)}%;${p<80?"background:linear-gradient(180deg,var(--amber),var(--amber-soft))":""}"></i><span>${i+1}k</span></div>`).join("")}</div>
-      <p class="small muted">Oranje: hier zit je groei. Je nieuwe woorden beginnen bij woord ${fmtNum(v.next)}.${T0.fa>20?" Let op: je zei 'ken ik' bij een paar nepwoorden. De schatting is daarvoor gecorrigeerd.":""} Het niveau is een grove indicatie (Milton & Alexiou, 2009).</p>`:""}
+      <p class="small muted">Oranje: hier zit je groei. Je nieuwe woorden beginnen bij woord ${fmtNum(v.next)}. Het niveau is een grove indicatie (Milton & Alexiou, 2009).</p>`:""}
     </section>
     <div class="two">
       <section class="glass pad stack">
@@ -1195,7 +1421,8 @@ function renderWords(m){
       <div class="row" style="justify-content:flex-end"><button class="btn ghost" id="readDone">Klaar met lezen</button><button class="btn primary" id="readAdd">Bewaar aangevinkte woorden</button></div>
     </section>`:""}
   </div>`;
-  $("#startTest").onclick=()=>{WD.test=buildTest();render();window.scrollTo({top:0});};
+  $("#startTest").onclick=()=>{if(!sample)return;WD.test=buildTest();prepareTest(WD.test);render();window.scrollTo({top:0});};
+  $("#playGame").onclick=startWordGame;
   $("#pasteIn").oninput=e=>WD.paste=e.target.value;
   $("#pasteGo").onclick=async()=>{
     const txt=WD.paste.trim();if(txt.length<3){$("#pasteIn").focus();return;}
