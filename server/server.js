@@ -29,24 +29,67 @@ const MODELS = {
   api: { quick: "claude-haiku-4-5-20251001", default: "claude-sonnet-5-5", complex: "claude-opus-5-5" },
 };
 
-function findClaude() {
-  const home = os.homedir();
-  const candidates = [
-    process.env.CLAUDE_BIN,
-    path.join(home, ".claude", "local", "claude"),
-    path.join(home, ".local", "bin", "claude"),
-    "/opt/homebrew/bin/claude",
-    "/usr/local/bin/claude",
-  ].filter(Boolean);
-  for (const c of candidates) if (fs.existsSync(c)) return c;
+function isExec(p) {
   try {
-    const p = execFileSync("/bin/sh", ["-lc", "command -v claude"], { encoding: "utf8" }).trim().split("\n").pop();
-    return p && fs.existsSync(p) ? p : null;
+    const st = fs.statSync(p);
+    return st.isFile() && (st.mode & 0o111) !== 0;
+  } catch {
+    return false;
+  }
+}
+// Zoek een bestand "claude" in een map, een paar niveaus diep (voor de desktop-app en nvm).
+function searchDir(dir, depth) {
+  if (depth < 0 || !fs.existsSync(dir)) return [];
+  const hits = [];
+  let entries = [];
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return hits;
+  }
+  for (const e of entries) {
+    const full = path.join(dir, e.name);
+    if (e.name === "claude" && isExec(full)) hits.push(full);
+    else if (e.isDirectory() && !e.name.startsWith(".") && e.name !== "node_modules") hits.push(...searchDir(full, depth - 1));
+  }
+  return hits;
+}
+function newest(paths) {
+  return paths.sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs)[0] || null;
+}
+function fromShell(shell, args) {
+  try {
+    const out = execFileSync(shell, args, { encoding: "utf8", timeout: 8000, stdio: ["ignore", "pipe", "ignore"] });
+    const p = out.trim().split("\n").pop().trim();
+    return p && isExec(p) ? p : null;
   } catch {
     return null;
   }
 }
-const CLAUDE_BIN = findClaude();
+function findClaude() {
+  const home = os.homedir();
+  const fixed = [
+    process.env.CLAUDE_BIN,
+    path.join(home, ".claude", "local", "claude"),
+    path.join(home, ".local", "bin", "claude"),
+    path.join(home, ".npm-global", "bin", "claude"),
+    path.join(home, ".bun", "bin", "claude"),
+    path.join(home, ".volta", "bin", "claude"),
+    "/opt/homebrew/bin/claude",
+    "/usr/local/bin/claude",
+  ].filter(Boolean);
+  for (const c of fixed) if (isExec(c)) return c;
+  for (const dir of (process.env.PATH || "").split(":")) if (dir && isExec(path.join(dir, "claude"))) return path.join(dir, "claude");
+  return (
+    fromShell("/bin/zsh", ["-ilc", "command -v claude"]) ||
+    fromShell("/bin/bash", ["-lc", "command -v claude"]) ||
+    newest(searchDir(path.join(home, ".nvm", "versions", "node"), 3)) ||
+    newest(searchDir(path.join(home, "Library", "Application Support", "Claude"), 5)) ||
+    newest(searchDir(path.join(home, "Library", "Application Support", "Claude Code"), 5)) ||
+    null
+  );
+}
+let CLAUDE_BIN = findClaude();
 
 // Zet een gesprek (rollenspel) om naar één prompt voor de CLI.
 function toPrompt(input) {
@@ -99,9 +142,10 @@ async function runApi(input, tier) {
 }
 
 async function askClaude(input, tier) {
+  if (!CLAUDE_BIN) CLAUDE_BIN = findClaude();
   if (CLAUDE_BIN) return runCli(toPrompt(input), tier);
   if (process.env.ANTHROPIC_API_KEY) return runApi(input, tier);
-  throw new Error("Claude Code is niet gevonden op deze Mac. Installeer Claude Code en log in, of zet een ANTHROPIC_API_KEY in het bestand .env.");
+  throw new Error("Claude Code is niet gevonden op deze Mac. Open Terminal en typ: which claude. Krijg je een pad terug? Zet dat in een bestand .env in de app-map als CLAUDE_BIN=/dat/pad en start Werkengels opnieuw. Krijg je niets terug? Dubbelklik dan op \"Claude Code installeren.command\".");
 }
 
 // ---------- HTTP ----------
