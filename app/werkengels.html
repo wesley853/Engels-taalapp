@@ -1,0 +1,619 @@
+<title>Werkengels</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: één smalle werkkolom met tabbladen, zoals een briefing-inbox; stappen als genummerde kaarten omdat de volgorde echt een proces is */
+:root{
+  --bg:#F3F5F4; --surface:#FFFFFF; --ink:#16211F; --muted:#5B6866; --line:#D8DEDC;
+  --accent:#0F6E66; --accent-soft:#DCEEEB; --accent-ink:#FFFFFF;
+  --warn:#B4530F; --warn-soft:#FBEADB; --good:#2F7D3B; --good-soft:#E1F1E3;
+  --f-display:"Bricolage Grotesque",system-ui,sans-serif;
+  --f-body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#101716; --surface:#18211F; --ink:#E6ECEA; --muted:#97A5A2; --line:#2B3735;
+  --accent:#4FB8AC; --accent-soft:#18332F; --accent-ink:#0B1413;
+  --warn:#F0A060; --warn-soft:#3A2617; --good:#7CC98A; --good-soft:#1B3220; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101716; --surface:#18211F; --ink:#E6ECEA; --muted:#97A5A2; --line:#2B3735;
+  --accent:#4FB8AC; --accent-soft:#18332F; --accent-ink:#0B1413;
+  --warn:#F0A060; --warn-soft:#3A2617; --good:#7CC98A; --good-soft:#1B3220; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--f-body);font-size:16px;line-height:1.5}
+.wrap{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:20px 64px;display:flex;flex-direction:column;gap:20px}
+header.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--f-display);font-weight:700;font-size:2rem;letter-spacing:-.02em;margin:0;line-height:1}
+h1 span{color:var(--accent)}
+h2{font-family:var(--f-display);font-weight:700;font-size:1.3rem;margin:0;text-wrap:balance}
+h3{font-family:var(--f-display);font-weight:500;font-size:1.08rem;margin:0;text-wrap:balance}
+p{margin:0}
+.sub{color:var(--muted);font-size:.95rem}
+.streak{font-family:var(--f-mono);font-size:.85rem;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap}
+.streak b{color:var(--ink);font-weight:500}
+nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5}
+nav.tabs button{font:600 .95rem var(--f-body);background:none;border:0;color:var(--muted);padding:10px 12px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.panel{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.step{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start}
+.step>.n{font-family:var(--f-mono);font-size:.8rem;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--line);color:var(--muted)}
+.step.done>.n{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.step.active>.n{border-color:var(--accent);color:var(--accent)}
+.step>div{min-width:0;display:flex;flex-direction:column;gap:10px}
+.label{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font:500 .78rem var(--f-mono);padding:3px 8px;border-radius:999px;background:var(--accent-soft);color:var(--ink)}
+.chip.time{background:transparent;border:1px solid var(--line)}
+.chip.warn{background:var(--warn-soft)}
+.chip.good{background:var(--good-soft)}
+button.btn{font:600 .95rem var(--f-body);border-radius:8px;padding:9px 16px;cursor:pointer;border:1.5px solid var(--accent);background:var(--accent);color:var(--accent-ink)}
+button.btn.ghost{background:transparent;color:var(--accent)}
+button.btn.quiet{background:transparent;color:var(--muted);border-color:var(--line)}
+button.btn:disabled{opacity:.5;cursor:not-allowed}
+button:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.spread{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+textarea,input[type=text],select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;width:100%}
+textarea{min-height:140px;resize:vertical}
+.brief{background:var(--accent-soft);border-radius:8px;padding:12px 14px}
+.brief p+p{margin-top:6px}
+.hint{font-size:.88rem;color:var(--muted)}
+.review-front{font-family:var(--f-display);font-size:1.25rem;font-weight:500}
+.answer{border-left:3px solid var(--accent);padding-left:12px}
+.answer .en{font-weight:600;font-size:1.1rem}
+.grade{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.grade button{font:600 .9rem var(--f-body);padding:8px 4px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+.grade button small{font:500 .72rem var(--f-mono);color:var(--muted)}
+.fb-point{display:grid;gap:4px;padding:10px 12px;border-radius:8px;background:var(--bg)}
+.fb-point .wrong{color:var(--warn);text-decoration:line-through;text-decoration-thickness:1px}
+.fb-point .right{color:var(--good);font-weight:600}
+.fb-list{display:flex;flex-direction:column;gap:8px}
+.tasks{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:12px}
+.task{cursor:pointer;text-align:left;font:inherit;color:inherit}
+.task:hover{border-color:var(--accent)}
+.task .meta{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.mins{font:500 1.5rem var(--f-mono);color:var(--accent);line-height:1}
+.mins small{font-size:.75rem;color:var(--muted)}
+.timer{font:500 1.6rem var(--f-mono);font-variant-numeric:tabular-nums}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--accent);transition:width .4s}
+.bar.over>i{background:var(--warn)}
+.chat{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;padding:4px}
+.msg{padding:9px 12px;border-radius:10px;max-width:85%;white-space:pre-wrap}
+.msg.ai{background:var(--bg);align-self:flex-start}
+.msg.me{background:var(--accent-soft);align-self:flex-end}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.stat{padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.stat b{display:block;font:500 1.5rem var(--f-mono);font-variant-numeric:tabular-nums}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:110px}
+.week div{display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;font:500 .72rem var(--f-mono);color:var(--muted)}
+.week i{display:block;width:100%;max-width:34px;background:var(--accent);border-radius:4px 4px 0 0;min-height:2px}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+td,th{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.tablewrap{overflow-x:auto}
+.notice{font-size:.88rem;padding:10px 12px;border-radius:8px;background:var(--warn-soft)}
+.thinking{color:var(--muted);font-style:italic}
+details summary{cursor:pointer;color:var(--accent);font-weight:600}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Werk<span>engels</span></h1>
+      <p class="sub">Zakelijk Engels voor online marketing. Je eigen fouten worden je lesstof.</p>
+    </div>
+    <div class="streak" id="streak"></div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="vandaag" aria-selected="true">Vandaag</button>
+    <button role="tab" data-tab="opdrachten" aria-selected="false">Opdrachten</button>
+    <button role="tab" data-tab="kaarten" aria-selected="false">Kaarten</button>
+    <button role="tab" data-tab="voortgang" aria-selected="false">Voortgang</button>
+  </nav>
+
+  <div id="storeNotice" class="notice" hidden></div>
+
+  <section class="panel" id="tab-vandaag"></section>
+  <section class="panel" id="tab-opdrachten" hidden></section>
+  <section class="panel" id="tab-kaarten" hidden></section>
+  <section class="panel" id="tab-voortgang" hidden></section>
+</div>
+
+<script>
+/* ---------- Content ---------- */
+const STARTER_CARDS = [
+  ["opvolgen (na een gesprek)","follow up on","I'll follow up on this after the call."],
+  ["zoals besproken","as discussed","As discussed, we'll pause the brand campaign."],
+  ["iets onder de aandacht brengen (als risico)","flag (something)","I'd like to flag that the budget runs out on Friday."],
+  ["een update geven over","give an update on","Let me give you a quick update on the Q3 results."],
+  ["het rendement op advertentie-uitgaven","return on ad spend (ROAS)","Our ROAS went up from 4.2 to 5.1."],
+  ["omzet daalde met 10%","revenue dropped by 10%","Revenue dropped by 10% compared to last month."],
+  ["vergeleken met dezelfde periode vorig jaar","year over year","Conversions are up 18% year over year."],
+  ["we zien een stijging in","we're seeing an increase in","We're seeing an increase in mobile traffic."],
+  ["de oorzaak daarvan is","this is driven by","This is mainly driven by higher CPCs."],
+  ["ik raad aan om","I'd recommend (+ -ing)","I'd recommend shifting budget to Performance Max."],
+  ["afstemmen met (een collega)","align with","I'll align with the design team first."],
+  ["iets afstemmen (laten kloppen)","get (something) aligned","Let's get the tracking aligned before launch."],
+  ["actueel","current / up to date","Is this report up to date? (niet: actual)"],
+  ["eigenlijk / feitelijk","actually","Actually, the CTR is fine. (actually = eigenlijk, niet actueel)"],
+  ["ik woon hier al twee jaar","I have lived here for two years","I have worked here for two years. (niet: I work here since)"],
+  ["sinds maandag","since Monday","We've been testing this since Monday."],
+  ["een afspraak maken","schedule a meeting","Shall we schedule a meeting for Thursday?"],
+  ["iets verzorgen / regelen","take care of","I'll take care of the reporting."],
+  ["mag ik iets vragen?","could I ask you something?","Could I ask you something about the brief?"],
+  ["het klopt niet","that's not right / that doesn't add up","These numbers don't add up."],
+  ["eventueel","possibly / if needed","We could possibly extend the test. (niet: eventually)"],
+  ["uiteindelijk","eventually","Eventually, we want to move to server-side tracking."],
+  ["controleren","check","Could you check the conversion tags? (niet: control)"],
+  ["solliciteren","apply for (a job)","She applied for the SEA position."],
+  ["een presentatie geven","give a presentation","I'll give a short presentation on the results."],
+  ["beslissing nemen","make a decision","We need to make a decision by Friday."],
+  ["onderzoek doen","do research / carry out research","We did some keyword research."],
+  ["dat ligt eraan","it depends","It depends on the budget."],
+  ["ik ben het met je eens","I agree with you","I agree with you on the bidding strategy. (niet: I am agree)"],
+  ["laat het me weten","let me know","Let me know if you have any questions."],
+  ["zo snel mogelijk","as soon as possible","We'll fix the feed as soon as possible."],
+  ["op korte termijn","in the short term","In the short term, we'll cut low-performing keywords."],
+  ["de doelgroep","target audience","Our target audience is small business owners."],
+  ["naamsbekendheid","brand awareness","The YouTube campaign is for brand awareness."],
+  ["de kosten per conversie verlagen","bring down the cost per acquisition","We want to bring down the CPA by 15%."],
+  ["vooruitlopend op","ahead of","We increased budgets ahead of Black Friday."],
+  ["kortom","in short / to sum up","In short, the test was a success."],
+  ["daarnaast","in addition / on top of that","On top of that, we improved the landing page."],
+  ["aan de andere kant","on the other hand","On the other hand, the CTR dropped."],
+  ["een bod verhogen","raise a bid","We raised bids on the top keywords."],
+  ["klantreis","customer journey","We mapped the customer journey from ad to checkout."],
+  ["dat zal ik nagaan","I'll look into it","Good question, I'll look into it."],
+  ["iets uitrollen","roll out","We'll roll out the new ads next week."],
+  ["prioriteit geven aan","prioritise","Let's prioritise the product feed issues."],
+  ["bottleneck","bottleneck","The checkout page is the main bottleneck."]
+];
+
+const DAILY_TASKS = [
+  {type:"schrijven",title:"Kort mailtje: campagne staat live",brief:"Laat een klant weten dat de nieuwe Google Ads campagne vandaag live is gegaan en wanneer je de eerste resultaten deelt.",words:"60 tot 90 woorden"},
+  {type:"spreken",title:"Stand-up update",brief:"Je zit in een Engelstalige stand-up. Vertel in 4 tot 6 zinnen wat je gisteren hebt gedaan, wat je vandaag doet en waar je vastloopt.",words:"4 tot 6 zinnen"},
+  {type:"schrijven",title:"Slecht nieuws brengen",brief:"De ROAS is deze week gedaald van 5,1 naar 3,8. Schrijf een kort bericht aan de klant: wat er gebeurde, wat de oorzaak waarschijnlijk is en wat je gaat doen.",words:"70 tot 100 woorden"},
+  {type:"spreken",title:"Uitleggen wat je doet",brief:"Iemand op een netwerkevent vraagt: 'So what do you do?' Leg in 4 tot 5 zinnen uit wat je werk in online marketing inhoudt.",words:"4 tot 5 zinnen"},
+  {type:"schrijven",title:"Om input vragen",brief:"Vraag een Engelstalige collega om voor donderdag feedback te geven op je zoekwoordenanalyse. Wees vriendelijk maar duidelijk over de deadline.",words:"50 tot 80 woorden"},
+  {type:"spreken",title:"Een test voorstellen",brief:"Stel in een meeting voor om een A/B-test te doen op de landingspagina. Leg uit waarom en wat je verwacht.",words:"4 tot 6 zinnen"},
+  {type:"schrijven",title:"Slack-bericht: tracking kapot",brief:"Je ziet dat de conversietracking sinds gisteren niets meer meet. Schrijf een Slack-bericht aan het dev-team.",words:"40 tot 70 woorden"},
+  {type:"spreken",title:"Resultaat toelichten",brief:"Leg uit waarom het aantal conversies in november met 25% steeg. Noem minstens twee oorzaken.",words:"4 tot 6 zinnen"},
+  {type:"schrijven",title:"Uitstel vragen",brief:"Je haalt de deadline voor het maandrapport niet. Mail je manager, leg kort uit waarom en stel een nieuwe datum voor.",words:"60 tot 90 woorden"},
+  {type:"spreken",title:"Het oneens zijn",brief:"Een klant wil het hele budget naar TikTok verplaatsen. Je bent het daar niet mee eens. Reageer beleefd en geef je argumenten.",words:"4 tot 6 zinnen"},
+  {type:"schrijven",title:"LinkedIn-reactie",brief:"Reageer inhoudelijk op een LinkedIn-post over de vraag of SEO 'dood' is door AI-zoekmachines.",words:"50 tot 80 woorden"},
+  {type:"spreken",title:"Klant bedanken en afsluiten",brief:"Sluit een call met een klant af: vat de afspraken samen, noem de volgende stappen en bedank de klant.",words:"4 tot 5 zinnen"},
+  {type:"schrijven",title:"Budgetvoorstel in het kort",brief:"Stel in een korte mail voor om het maandbudget met €2.000 te verhogen voor de feestdagen. Onderbouw met één of twee cijfers.",words:"60 tot 90 woorden"},
+  {type:"spreken",title:"Vakterm uitleggen",brief:"Leg aan een klant zonder marketingkennis uit wat 'Quality Score' is en waarom het belangrijk is.",words:"4 tot 6 zinnen"}
+];
+
+const LONG_TASKS = [
+  {id:"rapport",mins:20,type:"schrijven",mode:"feedback",title:"Maandrapportage schrijven",
+   brief:"Schrijf de samenvatting van een maandrapport voor een webshopklant. Cijfers: omzet €48.200 (+12% t.o.v. vorige maand), ROAS 4,6 (was 4,1), CPC steeg met 9%, Shopping presteerde het best, Display viel tegen.",
+   steps:["Lees de cijfers en bedenk de 3 belangrijkste punten (3 min)","Schrijf de samenvatting, 150 tot 200 woorden (12 min)","Lees terug en verbeter zelf eerst (3 min)","Laat Claude feedback geven en neem de verbeteringen door (2 min)"]},
+  {id:"pitch",mins:20,type:"spreken",mode:"rollenspel",title:"Rollenspel: pitch bij een nieuwe klant",
+   brief:"Je pitcht jullie bureau bij de marketingmanager van een Britse fietsenwebshop. Claude speelt de klant en stelt kritische vragen.",
+   role:"You are Sarah, Head of Marketing at a UK online bike shop (revenue £3M). You are meeting a Dutch online marketing agency. You are friendly but sceptical: you had a bad experience with a previous agency that didn't communicate well. Ask about results, reporting, pricing and how they handle bad months.",
+   steps:["Bedenk je openingszin en 3 sterke punten (3 min)","Voer het gesprek, minstens 8 beurten (14 min)","Rond af en vraag feedback (3 min)"]},
+  {id:"lastig",mins:15,type:"spreken",mode:"rollenspel",title:"Rollenspel: ontevreden klant",
+   brief:"Een klant belt boos omdat de leads deze maand gehalveerd zijn. Claude speelt de klant. Blijf rustig, toon begrip en kom met een plan.",
+   role:"You are Mark, owner of a B2B software company. Your leads from Google Ads dropped by 50% this month and you are frustrated. You are considering ending the contract. Push back on vague answers, but calm down if the marketer shows real understanding and a concrete plan.",
+   steps:["Bedenk hoe je het gesprek opent (2 min)","Voer het gesprek, minstens 6 beurten (10 min)","Vraag feedback (3 min)"]},
+  {id:"strategie",mins:45,type:"schrijven",mode:"feedback",title:"Strategievoorstel SEO",
+   brief:"Schrijf een SEO-strategievoorstel voor een Engelstalige klant die een nieuwe webshop in duurzame kleding lanceert. Behandel: doelen, zoekwoordaanpak, content, technische basis en planning voor 6 maanden.",
+   steps:["Maak een opzet met kopjes (8 min)","Schrijf per onderdeel 1 tot 2 alinea's (25 min)","Herlees op duidelijkheid en vaste uitdrukkingen (7 min)","Feedback van Claude doornemen (5 min)"]},
+  {id:"linkedin",mins:20,type:"schrijven",mode:"feedback",title:"LinkedIn-post over een case",
+   brief:"Schrijf een LinkedIn-post (Engels) over een campagne waarop je trots bent. Begin met een sterke openingszin, deel één concreet resultaat en eindig met een vraag aan je netwerk.",
+   steps:["Kies de case en het resultaat (3 min)","Schrijf de post, 120 tot 180 woorden (12 min)","Schaaf aan de openingszin (3 min)","Feedback van Claude (2 min)"]},
+  {id:"meeting",mins:15,type:"spreken",mode:"rollenspel",title:"Rollenspel: wekelijkse statusmeeting",
+   brief:"Je praat een Engelstalige accountmanager bij over drie lopende campagnes. Claude speelt de collega en vraagt door.",
+   role:"You are Tom, an account manager at the agency. You are preparing for a client call tomorrow and need a clear status update on three campaigns from the marketer. Ask follow-up questions about numbers, risks and next steps. Be collegial and informal.",
+   steps:["Noteer per campagne 1 punt (3 min)","Voer het gesprek (9 min)","Feedback (3 min)"]},
+  {id:"shadow",mins:10,type:"luisteren",mode:"shadowing",title:"Shadowing: een update uitspreken",
+   brief:"Laat de tekst voorlezen en spreek tegelijk mee. Let op ritme, klemtoon en verbindingen tussen woorden.",
+   text:"Quick update on the campaigns. Overall, performance is up compared to last month. Shopping is doing really well, with a return on ad spend of four point six. Search is stable, but costs per click have gone up by about nine percent. Display is still underperforming, so I'd recommend we pause it and move that budget to Shopping. I'll send the full report by Friday.",
+   steps:["Luister 2 keer zonder mee te praten (2 min)","Lees mee met de tekst en spreek zacht mee (3 min)","Spreek mee zonder naar de tekst te kijken (3 min)","Dicteer de tekst zelf en laat Claude het vergelijken (2 min)"]},
+  {id:"mailreeks",mins:30,type:"schrijven",mode:"feedback",title:"Lastige mailwisseling",
+   brief:"Een klant vraagt per mail waarom de factuur hoger is dan verwacht (er zijn extra uren gemaakt voor een feedprobleem). Schrijf een antwoord dat uitlegt, begrip toont en een oplossing biedt. Schrijf daarna een kortere versie voor als de klant opnieuw mailt.",
+   steps:["Bedenk de toon en de kernboodschap (4 min)","Schrijf de eerste mail (14 min)","Schrijf de korte vervolgmail (8 min)","Feedback van Claude (4 min)"]}
+];
+
+/* ---------- FSRS-5 (standaardparameters) ---------- */
+const W=[0.40255,1.18385,3.173,15.69105,7.1949,0.5345,1.4604,0.0046,1.54575,0.1192,1.01925,1.9395,0.11,0.29605,2.2698,0.2315,2.9898,0.51655,0.6621];
+const DECAY=-0.5, FACTOR=19/81, DAY=864e5;
+const clamp=(x,a,b)=>Math.min(b,Math.max(a,x));
+const retr=(t,S)=>Math.pow(1+FACTOR*t/S,DECAY);
+const d0=g=>clamp(W[4]-Math.exp(W[5]*(g-1))+1,1,10);
+function nextState(card,g,now){
+  if(!card.s){return {s:W[g-1],d:d0(g)};}
+  const t=Math.max(0,(now-card.last)/DAY), R=retr(t,card.s);
+  let d=card.d+(-W[6]*(g-3))*(10-card.d)/9;
+  d=clamp(W[7]*d0(4)+(1-W[7])*d,1,10);
+  let s;
+  if(g===1){s=Math.min(card.s,W[11]*Math.pow(card.d,-W[12])*(Math.pow(card.s+1,W[13])-1)*Math.exp(W[14]*(1-R)));}
+  else{s=card.s*(Math.exp(W[8])*(11-card.d)*Math.pow(card.s,-W[9])*(Math.exp(W[10]*(1-R))-1)*(g===2?W[15]:1)*(g===4?W[16]:1)+1);}
+  return {s,d};
+}
+function intervalDays(card,g,now){
+  if(g===1) return 0;
+  const st=nextState(card,g,now);
+  return Math.max(1,Math.round(st.s)); /* bij 90% gewenste kans op onthouden is interval = S */
+}
+function review(card,g,now){
+  const st=nextState(card,g,now);
+  const days=g===1?0:Math.max(1,Math.round(st.s));
+  return {...card,s:st.s,d:st.d,last:now,due:g===1?now+10*60e3:now+days*DAY,reps:(card.reps||0)+1,lapses:(card.lapses||0)+(g===1?1:0)};
+}
+const fmtInt=d=>d===0?"10 min":d<30?d+" d":d<365?Math.round(d/30)+" mnd":(d/365).toFixed(1)+" jr";
+
+/* ---------- Opslag ---------- */
+let db=null, uid=null, sample=null, storeMode="lokaal";
+const state={cards:{},profile:{days:{},mistakes:{},done:{},dailyIdx:0,lastDaily:""}};
+const today=()=>new Date().toISOString().slice(0,10);
+function newCardsFromStarter(){
+  const now=Date.now(), out={};
+  STARTER_CARDS.forEach(([nl,en,ex],i)=>{out["s"+i]={nl,en,ex,src:"start",due:now-(STARTER_CARDS.length-i)*1000,created:now};});
+  return out;
+}
+function lsGet(k){try{return JSON.parse(localStorage.getItem(k)||"null");}catch(e){return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+const writeQ={deck:Promise.resolve(),profile:Promise.resolve()};
+let saveTimers={};
+function save(which){
+  clearTimeout(saveTimers[which]);
+  saveTimers[which]=setTimeout(()=>{
+    const body=which==="deck"?{cards:state.cards}:state.profile;
+    const snapshot=JSON.parse(JSON.stringify(body));
+    if(db&&uid){
+      writeQ[which]=writeQ[which].then(()=>db.doc("data/users/"+uid+"/"+which).set(snapshot)).catch(e=>showNotice("Opslaan lukte niet ("+(e&&e.code||"fout")+"). Je voortgang staat nog in deze browser."));
+    }
+    lsSet("we_"+which,snapshot);
+  },600);
+}
+function showNotice(t){const n=document.getElementById("storeNotice");n.textContent=t;n.hidden=!t;}
+
+async function boot(){
+  const lc=lsGet("we_deck"), lp=lsGet("we_profile");
+  state.cards=(lc&&lc.cards)||newCardsFromStarter();
+  if(lp) Object.assign(state.profile,lp);
+  renderAll();
+  if(!window.claude||!window.claude.use){showNotice("Open deze pagina op claude.ai om feedback van Claude te krijgen en je voortgang op te slaan.");return;}
+  claude.use("sample").then(s=>{sample=s;renderAll();});
+  const [d,u]=await Promise.all([claude.use("db"),claude.use("user")]);
+  if(d&&u){
+    const id=await u.id();
+    if(id){
+      db=d;uid=id;storeMode="account";
+      try{
+        const [deck,prof]=await Promise.all([db.doc("data/users/"+uid+"/deck").get(),db.doc("data/users/"+uid+"/profile").get()]);
+        if(deck.exists) state.cards=deck.data().cards||{}; else save("deck");
+        if(prof.exists) state.profile=Object.assign({days:{},mistakes:{},done:{},dailyIdx:0,lastDaily:""},prof.data()); else save("profile");
+      }catch(e){showNotice("Je opgeslagen voortgang kon niet geladen worden. Je werkt nu met de versie in deze browser.");}
+    }
+  }
+  if(storeMode==="lokaal") showNotice("Je voortgang wordt alleen in deze browser bewaard.");
+  renderAll();
+}
+
+/* ---------- Helpers ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function addMinutes(m){const t=today();state.profile.days[t]=(state.profile.days[t]||0)+m;save("profile");renderStreak();}
+function streak(){let n=0;const d=new Date();for(;;){const k=d.toISOString().slice(0,10);if(state.profile.days[k]>0){n++;d.setDate(d.getDate()-1);}else if(n===0&&k===today()){d.setDate(d.getDate()-1);}else break;}return n;}
+const dueCards=()=>Object.entries(state.cards).filter(([,c])=>c.due<=Date.now()).sort((a,b)=>a[1].due-b[1].due);
+function renderStreak(){
+  const due=dueCards().length;
+  $("#streak").innerHTML=`<span><b>${streak()}</b> dagen op rij</span><span><b>${state.profile.days[today()]||0}</b> min vandaag</span><span><b>${due}</b> kaarten klaar</span>`;
+}
+function fmtClock(sec){const m=Math.floor(sec/60),s=sec%60;return String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");}
+
+/* ---------- Claude ---------- */
+const TUTOR=`You are an English writing and speaking coach for a Dutch online marketing professional (level B1-B2) who wants to sound natural and professional in business English.
+Rules:
+- Give at most 3 improvement points, the most important first. Prioritise: errors typical for Dutch speakers (false friends, tenses like present perfect, word order, literal translations), then unnatural phrasing, then style.
+- Explanations in Dutch, short and concrete. Corrections in English.
+- Also give a natural, professional version of the whole text, staying close to the learner's own words.
+- Suggest up to 3 useful chunks/collocations from the corrections for spaced repetition. "nl" = Dutch meaning or cue, "en" = English chunk, "ex" = short example sentence.
+- "goed" = one specific thing the learner did well (Dutch).
+- "categorie" for each point: one of "valse vriend","tijden","woordvolgorde","letterlijk vertaald","woordkeuze","grammatica","stijl","spelling".
+Respond ONLY with JSON: {"goed":string,"punten":[{"fout":string,"beter":string,"uitleg":string,"categorie":string}],"versie":string,"kaarten":[{"nl":string,"en":string,"ex":string}]}`;
+
+async function getFeedback(task,text,extra){
+  const input=`${TUTOR}
+
+Task given to the learner: ${task}
+${extra||""}
+Learner's text:
+"""
+${text}
+"""`;
+  return sample.json(input,{modelTier:"default"});
+}
+function applyFeedback(fb){
+  const now=Date.now();
+  (fb.kaarten||[]).slice(0,3).forEach((k,i)=>{
+    if(!k||!k.en) return;
+    const dup=Object.values(state.cards).some(c=>c.en.toLowerCase()===String(k.en).toLowerCase());
+    if(!dup) state.cards["f"+now+"_"+i]={nl:String(k.nl||""),en:String(k.en),ex:String(k.ex||""),src:"feedback",due:now,created:now};
+  });
+  (fb.punten||[]).forEach(p=>{const c=p.categorie||"overig";state.profile.mistakes[c]=(state.profile.mistakes[c]||0)+1;});
+  save("deck");save("profile");renderStreak();
+}
+function feedbackHTML(fb){
+  const pts=(fb.punten||[]).map(p=>`<div class="fb-point"><div><span class="wrong">${esc(p.fout)}</span> → <span class="right">${esc(p.beter)}</span></div><div class="hint">${esc(p.uitleg)} <span class="chip warn">${esc(p.categorie||"")}</span></div></div>`).join("");
+  const ks=(fb.kaarten||[]).slice(0,3).map(k=>`<span class="chip good">${esc(k.en)}</span>`).join("");
+  return `<div class="brief"><p><b>Goed:</b> ${esc(fb.goed)}</p></div>
+  <div class="label">Verbeterpunten</div><div class="fb-list">${pts||'<p class="hint">Geen verbeterpunten. Sterk!</p>'}</div>
+  <div class="label">Natuurlijkere versie</div><div class="answer"><p>${esc(fb.versie)}</p></div>
+  ${ks?`<div class="label">Toegevoegd aan je kaarten</div><div class="chips">${ks}</div>`:""}`;
+}
+function sampleError(e){
+  const c=e&&e.code;
+  if(c==="not_granted") return "Je hebt geen toestemming gegeven om Claude te gebruiken. Herlaad de pagina en sta het toe om feedback te krijgen.";
+  if(c==="rate_limited") return "Je zit even aan je limiet van Claude. Probeer het over een paar minuten opnieuw.";
+  return "Feedback ophalen lukte niet. Probeer het opnieuw.";
+}
+const DICTATE=`<details><summary>Hoe spreek ik in?</summary><p class="hint" style="margin-top:6px">Gebruik de dicteerfunctie van je apparaat. Telefoon: tik op de microfoon van je toetsenbord. Mac: druk twee keer op Fn. Windows: Win + H. Zet de dicteertaal op Engels. Claude beoordeelt wat je zegt (woorden en zinnen), maar kan je uitspraak niet horen.</p></details>`;
+
+/* ---------- Tab: Vandaag ---------- */
+const today_s={phase:"review",reviewDone:0,shown:false,input:"",fb:null,loading:false,err:"",text:"",startedAt:0};
+const REVIEW_LIMIT=12;
+function dailyTask(){
+  if(state.profile.lastDaily!==today()){state.profile.dailyIdx=((state.profile.dailyIdx||0)+1)%DAILY_TASKS.length;state.profile.lastDaily=today();save("profile");}
+  return DAILY_TASKS[state.profile.dailyIdx%DAILY_TASKS.length];
+}
+function renderToday(){
+  const el=$("#tab-vandaag");
+  if(!today_s.startedAt) today_s.startedAt=Date.now();
+  const due=dueCards(), task=dailyTask();
+  const reviewActive=today_s.phase==="review"&&due.length>0&&today_s.reviewDone<REVIEW_LIMIT;
+  if(today_s.phase==="review"&&!reviewActive) today_s.phase="task";
+  let s1="";
+  if(reviewActive){
+    const [id,c]=due[0];
+    s1=`<p class="hint">${today_s.reviewDone} van max. ${Math.min(REVIEW_LIMIT,today_s.reviewDone+due.length)} · Typ het Engels en controleer.</p>
+    <div class="review-front">${esc(c.nl)}</div>
+    ${today_s.shown?`
+      ${today_s.input?`<p class="hint">Jij: ${esc(today_s.input)}</p>`:""}
+      <div class="answer"><div class="en">${esc(c.en)}</div><div class="hint">${esc(c.ex)}</div></div>
+      <div class="grade">${[["Opnieuw",1],["Moeilijk",2],["Goed",3],["Makkelijk",4]].map(([l,g])=>`<button data-grade="${g}" data-id="${id}">${l}<small>${fmtInt(intervalDays(c,g,Date.now()))}</small></button>`).join("")}</div>`
+    :`<input type="text" id="revInput" placeholder="In het Engels…" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <div class="row"><button class="btn" id="revCheck">Controleer</button><button class="btn quiet" id="revSkip">Sla herhalen over</button></div>`}`;
+  }else{
+    s1=`<p class="hint">${today_s.reviewDone?`${today_s.reviewDone} kaarten herhaald.`:"Geen kaarten die vandaag terug moeten komen."}</p>`;
+  }
+  const taskPhase=today_s.phase==="task", fbPhase=today_s.phase==="fb";
+  let s2=`<div class="spread"><h3>${esc(task.title)}</h3><span class="chip">${task.type}</span></div>
+    <div class="brief"><p>${esc(task.brief)}</p><p class="hint">Lengte: ${task.words}</p></div>`;
+  if(taskPhase){
+    s2+=`${task.type==="spreken"?DICTATE:""}
+    <textarea id="dailyText" placeholder="${task.type==="spreken"?"Spreek in met dicteren, of typ wat je zou zeggen…":"Schrijf in het Engels…"}">${esc(today_s.text)}</textarea>
+    ${today_s.err?`<p class="notice">${esc(today_s.err)}</p>`:""}
+    <div class="row"><button class="btn" id="dailySend" ${sample?"":"disabled"}>${today_s.loading?"Claude leest mee…":"Vraag feedback"}</button>${sample?"":'<span class="hint">Feedback werkt alleen op claude.ai.</span>'}</div>`;
+  }
+  let s3="";
+  if(fbPhase&&today_s.fb){s3=feedbackHTML(today_s.fb)+`<div class="row"><button class="btn ghost" id="dailyAgain">Nog een poging</button></div><p class="hint">Klaar voor vandaag. De nieuwe kaarten komen morgen of overmorgen terug.</p>`;}
+  else s3=`<p class="hint">Max. 3 verbeterpunten en een natuurlijkere versie. Nieuwe uitdrukkingen gaan automatisch naar je kaarten.</p>`;
+  const st=(n,active,done)=>`step${done?" done":active?" active":""}`;
+  el.innerHTML=`
+  <div class="spread"><h2>Dagelijkse sessie</h2><span class="chip time">± 8 min</span></div>
+  <div class="card ${st(1,reviewActive,!reviewActive)}"><span class="n">1</span><div><div class="spread"><h3>Herhalen</h3><span class="chip time">3 min</span></div>${s1}</div></div>
+  <div class="card ${st(2,taskPhase,fbPhase)}"><span class="n">2</span><div><div class="spread"><span class="label">Opdracht van vandaag</span><span class="chip time">4 min</span></div>${s2}</div></div>
+  <div class="card ${st(3,fbPhase,false)}"><span class="n">3</span><div><div class="spread"><h3>Feedback</h3><span class="chip time">1 min</span></div>${s3}</div></div>`;
+  el.querySelectorAll(".card").forEach(c=>c.classList.add("step"));
+  const ri=$("#revInput"); if(ri){ri.focus({preventScroll:true});ri.addEventListener("keydown",e=>{if(e.key==="Enter")checkRev();});}
+  $("#revCheck")&&($("#revCheck").onclick=checkRev);
+  $("#revSkip")&&($("#revSkip").onclick=()=>{today_s.phase="task";renderToday();});
+  el.querySelectorAll("[data-grade]").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.id,g=+b.dataset.grade;
+    state.cards[id]=review(state.cards[id],g,Date.now());
+    today_s.reviewDone++;today_s.shown=false;today_s.input="";
+    save("deck");renderToday();renderStreak();
+  });
+  const ta=$("#dailyText"); if(ta) ta.oninput=()=>{today_s.text=ta.value;};
+  $("#dailySend")&&($("#dailySend").onclick=async()=>{
+    const text=(today_s.text||"").trim(); if(text.length<15){today_s.err="Schrijf of spreek eerst wat meer in.";renderToday();return;}
+    today_s.loading=true;today_s.err="";renderToday();
+    try{const fb=await getFeedback(task.brief+" ("+task.words+")",text);today_s.fb=fb;today_s.phase="fb";applyFeedback(fb);
+      addMinutes(Math.max(1,Math.round((Date.now()-today_s.startedAt)/60000)));today_s.startedAt=Date.now();}
+    catch(e){today_s.err=sampleError(e);}
+    today_s.loading=false;renderToday();
+  });
+  $("#dailyAgain")&&($("#dailyAgain").onclick=()=>{today_s.phase="task";today_s.fb=null;renderToday();});
+}
+function checkRev(){today_s.input=($("#revInput")||{}).value||"";today_s.shown=true;renderToday();}
+
+/* ---------- Tab: Opdrachten ---------- */
+const lt={active:null,start:0,elapsed:0,timer:null,text:"",fb:null,loading:false,err:"",chat:[],custom:{desc:"",mins:20,type:"schrijven"}};
+function doneInfo(id){const d=state.profile.done[id];return d?`<span class="chip good">${d.count}× gedaan · gem. ${Math.round(d.totalMins/d.count)} min</span>`:"";}
+function renderLong(){
+  const el=$("#tab-opdrachten");
+  if(lt.active){renderActive(el);return;}
+  const groups=[["Kort (10 tot 15 min)",t=>t.mins<=15],["Middel (20 tot 30 min)",t=>t.mins>15&&t.mins<=30],["Lang (45 min of meer)",t=>t.mins>30]];
+  el.innerHTML=`<div><h2>Langere opdrachten</h2><p class="sub">Voor als je meer tijd hebt. De tijd is een inschatting; je ziet na afloop hoe lang je er echt over deed.</p></div>
+  ${groups.map(([lbl,f])=>{const ts=LONG_TASKS.filter(f);return ts.length?`<div class="label">${lbl}</div><div class="tasks">${ts.map(t=>`
+    <button class="card task" data-task="${t.id}">
+      <div class="meta"><span class="mins">${t.mins}<small> min</small></span><span class="chips"><span class="chip">${t.type}</span>${t.mode==="rollenspel"?'<span class="chip">rollenspel</span>':""}</span></div>
+      <h3>${esc(t.title)}</h3><p class="hint">${esc(t.brief)}</p>${doneInfo(t.id)}
+    </button>`).join("")}</div>`:""}).join("")}
+  <div class="card"><h3>Eigen opdracht</h3><p class="hint">Plak een echte mail of beschrijf een situatie uit je werk. Kies hoeveel tijd je hebt.</p>
+    <textarea id="cDesc" placeholder="Bijv.: Ik moet morgen een klant uitleggen waarom we overstappen naar Performance Max…">${esc(lt.custom.desc)}</textarea>
+    <div class="row"><select id="cType" style="width:auto"><option value="schrijven">Schrijven</option><option value="spreken">Spreken</option><option value="rollenspel">Rollenspel</option></select>
+    <select id="cMins" style="width:auto"><option>10</option><option selected>20</option><option>30</option><option>45</option></select><span class="hint">min</span>
+    <button class="btn" id="cStart">Start</button></div></div>`;
+  $("#cType").value=lt.custom.type;$("#cMins").value=String(lt.custom.mins);
+  el.querySelectorAll("[data-task]").forEach(b=>b.onclick=()=>startLong(LONG_TASKS.find(t=>t.id===b.dataset.task)));
+  $("#cDesc").oninput=e=>lt.custom.desc=e.target.value;
+  $("#cType").onchange=e=>lt.custom.type=e.target.value;
+  $("#cMins").onchange=e=>lt.custom.mins=+e.target.value;
+  $("#cStart").onclick=()=>{
+    const d=lt.custom.desc.trim(); if(d.length<10) return;
+    const rp=lt.custom.type==="rollenspel";
+    startLong({id:"eigen",mins:lt.custom.mins,type:rp?"spreken":lt.custom.type,mode:rp?"rollenspel":"feedback",title:"Eigen opdracht",brief:d,
+      role:rp?`Play the other person in this workplace situation described by the learner (in Dutch): "${d}". Stay in character, be realistic, ask follow-up questions.`:"",
+      steps:["Bedenk wat je wilt zeggen","Voer de opdracht uit","Neem de feedback door"]});
+  };
+}
+function startLong(t){
+  Object.assign(lt,{active:t,start:Date.now(),elapsed:0,text:"",fb:null,err:"",chat:[],loading:false});
+  clearInterval(lt.timer);lt.timer=setInterval(tick,1000);
+  renderLong();
+  if(t.mode==="rollenspel") aiTurn();
+}
+function tick(){
+  if(!lt.active) return;
+  lt.elapsed=Math.floor((Date.now()-lt.start)/1000);
+  const tEl=$("#ltClock"),bEl=$("#ltBar");
+  if(tEl){tEl.textContent=fmtClock(lt.elapsed);const p=lt.elapsed/(lt.active.mins*60);bEl.firstElementChild.style.width=Math.min(100,p*100)+"%";bEl.classList.toggle("over",p>1);}
+}
+function finishLong(){
+  const t=lt.active, mins=Math.max(1,Math.round(lt.elapsed/60));
+  const d=state.profile.done[t.id]||{count:0,totalMins:0,est:t.mins};
+  d.count++;d.totalMins+=mins;d.last=today();state.profile.done[t.id]=d;
+  addMinutes(mins);
+  clearInterval(lt.timer);
+  lt.summary={title:t.title,mins,est:t.mins};
+  lt.active=null;renderLong();
+  const el=$("#tab-opdrachten");
+  const diff=mins-lt.summary.est;
+  el.insertAdjacentHTML("afterbegin",`<div class="card"><h3>Afgerond: ${esc(lt.summary.title)}</h3><p>Je deed er <b>${mins} min</b> over (geschat: ${lt.summary.est} min${diff?`, ${Math.abs(diff)} min ${diff>0?"langer":"korter"}`:""}).</p></div>`);
+}
+async function aiTurn(){
+  const t=lt.active; if(!sample){lt.err="Rollenspel werkt alleen op claude.ai.";renderLong();return;}
+  lt.loading=true;renderLong();
+  const sys=`${t.role}
+This is a speaking practice role-play with a Dutch learner (B1-B2) of business English. Speak natural, professional British or American business English. Keep each reply to 1-3 sentences and end with something the learner can respond to. Do not correct the learner during the conversation. Never break character.`;
+  const turns=[{role:"user",content:sys+"\n\nStart the conversation now with your first line."}];
+  lt.chat.forEach(m=>turns.push({role:m.who==="ai"?"assistant":"user",content:m.text}));
+  try{
+    const r=await sample(turns,{modelTier:"quick",cache:false});
+    lt.chat.push({who:"ai",text:r.text.trim()});
+  }catch(e){lt.err=sampleError(e);}
+  lt.loading=false;renderLong();
+}
+function renderActive(el){
+  const t=lt.active;
+  const p=lt.elapsed/(t.mins*60);
+  let body="";
+  if(t.mode==="rollenspel"){
+    body=`<div class="chat" id="chat">${lt.chat.map(m=>`<div class="msg ${m.who}">${esc(m.text)}</div>`).join("")}${lt.loading?'<div class="msg ai thinking">…</div>':""}</div>
+    ${DICTATE}
+    <textarea id="ltText" placeholder="Jouw antwoord in het Engels…" style="min-height:90px">${esc(lt.text)}</textarea>
+    <div class="row"><button class="btn" id="ltSay" ${lt.loading?"disabled":""}>Verstuur</button><button class="btn ghost" id="ltFb" ${lt.chat.filter(m=>m.who==="me").length<2||lt.loading?"disabled":""}>Stop en vraag feedback</button></div>`;
+  }else if(t.mode==="shadowing"){
+    body=`<div class="answer"><p>${esc(t.text)}</p></div>
+    <div class="row"><button class="btn" id="tts">Voorlezen</button><button class="btn ghost" id="ttsSlow">Langzaam</button><button class="btn quiet" id="ttsStop">Stop</button></div>
+    ${DICTATE}
+    <textarea id="ltText" placeholder="Laatste stap: dicteer de tekst uit je hoofd…" style="min-height:100px">${esc(lt.text)}</textarea>
+    <div class="row"><button class="btn" id="ltSend" ${lt.loading||!sample?"disabled":""}>${lt.loading?"Claude leest mee…":"Vergelijk"}</button></div>`;
+  }else{
+    body=`${t.type==="spreken"?DICTATE:""}<textarea id="ltText" placeholder="Schrijf in het Engels…" style="min-height:240px">${esc(lt.text)}</textarea>
+    <div class="row"><button class="btn" id="ltSend" ${lt.loading||!sample?"disabled":""}>${lt.loading?"Claude leest mee…":"Vraag feedback"}</button><span class="hint" id="wc"></span></div>`;
+  }
+  el.innerHTML=`<div class="row"><button class="btn quiet" id="ltBack">← Alle opdrachten</button></div>
+  <div class="card">
+    <div class="spread"><h2>${esc(t.title)}</h2><span class="chips"><span class="chip">${t.type}</span></span></div>
+    <div class="spread"><span class="timer" id="ltClock">${fmtClock(lt.elapsed)}</span><span class="hint">geschat ${t.mins} min</span></div>
+    <div class="bar${p>1?" over":""}" id="ltBar"><i style="width:${Math.min(100,p*100)}%"></i></div>
+    <div class="brief"><p>${esc(t.brief)}</p></div>
+    <div><div class="label">Stappen</div><ol style="margin:6px 0 0;padding-left:20px">${t.steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol></div>
+  </div>
+  <div class="card">${body}${lt.err?`<p class="notice">${esc(lt.err)}</p>`:""}</div>
+  ${lt.fb?`<div class="card">${feedbackHTML(lt.fb)}<div class="row"><button class="btn" id="ltDone">Afronden en tijd opslaan</button></div></div>`:
+   `<div class="row"><button class="btn quiet" id="ltDone">Afronden zonder feedback</button></div>`}`;
+  const ta=$("#ltText"); if(ta){ta.oninput=()=>{lt.text=ta.value;const w=$("#wc");if(w)w.textContent=(ta.value.trim().split(/\s+/).filter(Boolean).length)+" woorden";};}
+  const ch=$("#chat"); if(ch) ch.scrollTop=ch.scrollHeight;
+  $("#ltBack").onclick=()=>{clearInterval(lt.timer);lt.active=null;renderLong();};
+  $("#ltDone").onclick=finishLong;
+  $("#ltSay")&&($("#ltSay").onclick=()=>{const v=lt.text.trim();if(!v)return;lt.chat.push({who:"me",text:v});lt.text="";aiTurn();});
+  $("#ltFb")&&($("#ltFb").onclick=()=>{
+    const convo=lt.chat.map(m=>(m.who==="me"?"LEARNER: ":"OTHER: ")+m.text).join("\n");
+    const mine=lt.chat.filter(m=>m.who==="me").map(m=>m.text).join("\n");
+    sendLong(mine,`This was a spoken role-play. Full conversation for context:\n${convo}\nGive feedback only on the LEARNER's lines. For "versie", rewrite the learner's lines (one per line) as a natural speaker would say them.`);
+  });
+  $("#ltSend")&&($("#ltSend").onclick=()=>{
+    const v=lt.text.trim(); if(v.length<15){lt.err="Schrijf eerst wat meer.";renderLong();return;}
+    sendLong(v,t.mode==="shadowing"?`The learner tried to reproduce this text from memory (via dictation). Original text:\n"${t.text}"\nFocus on what they missed or changed and which chunks to remember.`:"");
+  });
+  const speak=rate=>{try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t.text);u.lang="en-GB";u.rate=rate;speechSynthesis.speak(u);}catch(e){lt.err="Voorlezen werkt niet in deze browser.";renderLong();}};
+  $("#tts")&&($("#tts").onclick=()=>speak(1));
+  $("#ttsSlow")&&($("#ttsSlow").onclick=()=>speak(.75));
+  $("#ttsStop")&&($("#ttsStop").onclick=()=>{try{speechSynthesis.cancel();}catch(e){}});
+}
+async function sendLong(text,extra){
+  lt.loading=true;lt.err="";renderLong();
+  try{const fb=await getFeedback(lt.active.brief,text,extra);lt.fb=fb;applyFeedback(fb);}catch(e){lt.err=sampleError(e);}
+  lt.loading=false;renderLong();
+}
+
+/* ---------- Tab: Kaarten ---------- */
+const kf={q:"",adding:false};
+function renderCards(){
+  const el=$("#tab-kaarten");
+  const all=Object.entries(state.cards).sort((a,b)=>a[1].due-b[1].due);
+  const q=kf.q.toLowerCase();
+  const list=all.filter(([,c])=>!q||c.nl.toLowerCase().includes(q)||c.en.toLowerCase().includes(q));
+  const when=c=>{const d=(c.due-Date.now())/DAY;return d<=0?'<span class="chip warn">nu</span>':d<1?'<span class="chip time">vandaag</span>':`<span class="chip time">${fmtInt(Math.round(d))}</span>`;};
+  el.innerHTML=`<div class="spread"><div><h2>Kaarten</h2><p class="sub">${all.length} kaarten. Herhaling volgens het FSRS-algoritme: elke kaart komt terug net voordat je hem zou vergeten.</p></div></div>
+  <div class="card"><h3>Kaart toevoegen</h3>
+    <div class="row" style="flex-wrap:nowrap;flex-direction:column;align-items:stretch">
+      <input type="text" id="nNl" placeholder="Nederlands of hint (bijv. 'iets uitstellen')">
+      <input type="text" id="nEn" placeholder="Engels (bijv. 'put something on hold')">
+      <input type="text" id="nEx" placeholder="Voorbeeldzin (optioneel)">
+    </div><div class="row"><button class="btn" id="nAdd">Toevoegen</button></div></div>
+  <input type="text" id="kSearch" placeholder="Zoek in je kaarten…" value="${esc(kf.q)}">
+  <div class="card tablewrap"><table><thead><tr><th>Nederlands</th><th>Engels</th><th>Terug</th><th></th></tr></thead><tbody>
+  ${list.map(([id,c])=>`<tr><td>${esc(c.nl)}</td><td><b>${esc(c.en)}</b><div class="hint">${esc(c.ex)}</div></td><td>${when(c)}</td><td><button class="btn quiet" data-del="${id}" aria-label="Verwijder">×</button></td></tr>`).join("")}
+  </tbody></table></div>`;
+  $("#kSearch").oninput=e=>{kf.q=e.target.value;const pos=e.target.selectionStart;renderCards();const s=$("#kSearch");s.focus();s.setSelectionRange(pos,pos);};
+  $("#nAdd").onclick=()=>{const nl=$("#nNl").value.trim(),en=$("#nEn").value.trim();if(!nl||!en)return;
+    const now=Date.now();state.cards["u"+now]={nl,en,ex:$("#nEx").value.trim(),src:"eigen",due:now,created:now};save("deck");renderCards();renderStreak();};
+  el.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{
+    if(b.dataset.confirm){delete state.cards[b.dataset.del];save("deck");renderCards();renderStreak();}
+    else{b.dataset.confirm="1";b.textContent="Zeker?";}
+  });
+}
+
+/* ---------- Tab: Voortgang ---------- */
+function renderProgress(){
+  const el=$("#tab-voortgang");
+  const cards=Object.values(state.cards);
+  const learned=cards.filter(c=>c.s&&c.s>=21).length, started=cards.filter(c=>c.reps).length;
+  const days=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=d.toISOString().slice(0,10);days.push([d.toLocaleDateString("nl-NL",{weekday:"short"}),state.profile.days[k]||0]);}
+  const max=Math.max(10,...days.map(d=>d[1]));
+  const weekTotal=days.reduce((a,d)=>a+d[1],0);
+  const mist=Object.entries(state.profile.mistakes).sort((a,b)=>b[1]-a[1]);
+  const mmax=Math.max(1,...mist.map(m=>m[1]));
+  const done=Object.entries(state.profile.done);
+  el.innerHTML=`<h2>Voortgang</h2>
+  <div class="stats">
+    <div class="stat"><span class="label">Dagen op rij</span><b>${streak()}</b></div>
+    <div class="stat"><span class="label">Deze week</span><b>${weekTotal} min</b></div>
+    <div class="stat"><span class="label">Kaarten geoefend</span><b>${started}</b></div>
+    <div class="stat"><span class="label">Goed vast</span><b>${learned}</b><span class="hint">3+ weken onthouden</span></div>
+  </div>
+  <div class="card"><h3>Minuten per dag</h3><div class="week">${days.map(([l,v])=>`<div><span>${v||""}</span><i style="height:${v/max*80}%"></i><span>${l}</span></div>`).join("")}</div></div>
+  <div class="card"><h3>Je meest gemaakte fouten</h3>
+   ${mist.length?mist.map(([k,v])=>`<div style="display:grid;grid-template-columns:150px 1fr 30px;gap:10px;align-items:center"><span>${esc(k)}</span><div class="bar"><i style="width:${v/mmax*100}%;background:var(--warn)"></i></div><span style="font-family:var(--f-mono);font-size:.85rem">${v}</span></div>`).join(""):'<p class="hint">Nog geen feedback ontvangen. Na je eerste opdracht zie je hier welke soort fouten terugkomen.</p>'}</div>
+  <div class="card"><h3>Opdrachten: geschat vs. echt</h3>
+   ${done.length?`<div class="tablewrap"><table><thead><tr><th>Opdracht</th><th>Keer</th><th>Geschat</th><th>Gemiddeld echt</th></tr></thead><tbody>${done.map(([id,d])=>{const t=LONG_TASKS.find(x=>x.id===id);return `<tr><td>${esc(t?t.title:"Eigen opdracht")}</td><td>${d.count}</td><td>${d.est} min</td><td>${Math.round(d.totalMins/d.count)} min</td></tr>`;}).join("")}</tbody></table></div>`:'<p class="hint">Rond een langere opdracht af om te zien hoe lang je er echt over doet.</p>'}</div>`;
+}
+
+/* ---------- Tabs ---------- */
+function renderAll(){renderStreak();renderToday();if(!lt.active)renderLong();renderCards();renderProgress();}
+document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("nav.tabs button").forEach(x=>x.setAttribute("aria-selected",x===b?"true":"false"));
+  document.querySelectorAll(".panel").forEach(p=>p.hidden=p.id!=="tab-"+b.dataset.tab);
+  if(b.dataset.tab==="voortgang")renderProgress();
+  if(b.dataset.tab==="kaarten")renderCards();
+  if(b.dataset.tab==="vandaag")renderToday();
+  try{localStorage.setItem("we_tab",b.dataset.tab);}catch(e){}
+});
+boot();
+(()=>{let t=null;try{t=localStorage.getItem("we_tab");}catch(e){}const b=t&&document.querySelector(`[data-tab="${t}"]`);if(b)b.click();})();
+</script>
