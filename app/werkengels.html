@@ -158,6 +158,8 @@ details summary{cursor:pointer;color:var(--teal);font-weight:600;font-size:.92re
 .fbp .wrong{color:var(--red);text-decoration:line-through;text-decoration-thickness:1.5px}
 .fbp .right{color:var(--green);font-weight:700}
 .version{border-left:3px solid var(--teal);padding:4px 0 4px 16px;white-space:pre-wrap}
+.verdict{font-size:.92rem;padding:8px 12px;border-radius:10px;background:var(--line);align-self:flex-start}
+.verdict.green{background:var(--green-soft)}.verdict.amber{background:var(--amber-soft)}.verdict.red{background:var(--red-soft)}
 .good{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:12px;background:var(--green-soft)}
 .good svg{width:20px;height:20px;flex:none;color:var(--green);margin-top:2px}
 .celebrate{text-align:center;padding:40px 24px;display:flex;flex-direction:column;align-items:center;gap:14px;position:relative;overflow:hidden}
@@ -427,12 +429,77 @@ const sessionDone=()=>!!(state.profile.sessions||{})[today()];
 function addMinutes(m){const t=today();state.profile.days[t]=(state.profile.days[t]||0)+m;save("profile");}
 function streak(){let n=0;const d=new Date();if(!(state.profile.days[dkey(d)]>0))d.setDate(d.getDate()-1);while(state.profile.days[dkey(d)]>0){n++;d.setDate(d.getDate()-1);}return n;}
 const fmtClock=s=>String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
-const norm=s=>String(s).toLowerCase().replace(/\(.*?\)/g,"").replace(/[^a-z' ]/g," ").replace(/\s+/g," ").trim();
-function similarity(a,b){a=norm(a);b=norm(b);if(!a||!b)return 0;if(a===b)return 1;
-  const alts=b.split("/").map(x=>x.trim());if(alts.some(x=>x&&a===x))return 1;
-  const m=a.length,n=b.length,dp=Array.from({length:m+1},(_,i)=>[i]);for(let j=1;j<=n;j++)dp[0][j]=j;
-  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)dp[i][j]=Math.min(dp[i-1][j]+1,dp[i][j-1]+1,dp[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
-  return 1-dp[m][n]/Math.max(m,n);}
+/* ---- Eerlijk nakijken: spelfoutjes, afkortingen, UK/US-spelling en alternatieven tellen niet als fout ---- */
+const CONTR={"i'd":"i would","i'll":"i will","i'm":"i am","i've":"i have","we're":"we are","we've":"we have","we'll":"we will","we'd":"we would","you're":"you are","you'll":"you will","they're":"they are","it's":"it is","that's":"that is","there's":"there is","let's":"let us","don't":"do not","doesn't":"does not","didn't":"did not","can't":"cannot","won't":"will not","isn't":"is not","aren't":"are not","wasn't":"was not","haven't":"have not","shouldn't":"should not","couldn't":"could not","wouldn't":"would not",
+  "id":"i would","im":"i am","ive":"i have","dont":"do not","doesnt":"does not","didnt":"did not","cant":"cannot","isnt":"is not","arent":"are not","wasnt":"was not","havent":"have not","shouldnt":"should not","couldnt":"could not","wouldnt":"would not","youre":"you are","theyre":"they are","weve":"we have","thats":"that is","theres":"there is",
+  "cpa":"cost per acquisition","roas":"return on ad spend","cpc":"cost per click","ctr":"click through rate","yoy":"year over year","asap":"as soon as possible","seo":"search engine optimization","sea":"search engine advertising"};
+const MINOR=new Set(["a","an","the","to","some","my","our","your","this","that"]);
+function toWords(str){
+  return String(str).toLowerCase().replace(/[’‘`´]/g,"'").replace(/[^a-z0-9' ]/g," ").split(/\s+/).filter(Boolean)
+    .flatMap(w=>(CONTR[w]||w.replace(/'s$/,"")).split(" "))
+    .map(w=>w.replace(/'/g,"").replace(/is(e|ed|es|ing|ation|ations)$/,"iz$1").replace(/yse$/,"yze").replace(/our$/,"or").replace(/tre$/,"ter"))
+    .filter(w=>w&&w!=="something"&&w!=="someone");
+}
+function lev(a,b){const m=a.length,n=b.length;let prev=Array.from({length:n+1},(_,j)=>j);
+  for(let i=1;i<=m;i++){const cur=[i];for(let j=1;j<=n;j++)cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));prev=cur;}return prev[n];}
+const typoOK=(a,b)=>{const L=Math.max(a.length,b.length);return lev(a,b)<=(L>=8?2:L>=4?1:0);};
+function answerVariants(en){
+  const out=[];
+  String(en).split("/").forEach(alt=>{
+    const plain=alt.replace(/\(.*?\)/g," ");
+    out.push(plain);
+    const inner=[...alt.matchAll(/\(([^)]*)\)/g)].map(m=>m[1]).filter(x=>/^[a-z ]+$/i.test(x.trim()));
+    if(inner.length){out.push(alt.replace(/[()]/g," "));inner.forEach(x=>out.push(x));}
+  });
+  return out.map(toWords).filter(w=>w.length);
+}
+/* Woord-voor-woord uitlijnen. Spelfout = 0, ontbrekend lidwoord = klein, ontbrekend kernwoord = 1, extra woord = bijna gratis. */
+function alignWords(A,T){
+  const m=A.length,n=T.length,INF=1e9;
+  const dp=Array.from({length:m+1},()=>Array(n+1).fill(INF)),bt=Array.from({length:m+1},()=>Array(n+1).fill(null));
+  dp[0][0]=0;
+  for(let i=0;i<=m;i++)for(let j=0;j<=n;j++){const c=dp[i][j];if(c===INF)continue;
+    if(i<m&&j<n){const a=A[i],t=T[j];
+      if(a===t){if(c<dp[i+1][j+1]){dp[i+1][j+1]=c;bt[i+1][j+1]=["ok",a,t];}}
+      else if(typoOK(a,t)){if(c+0.01<dp[i+1][j+1]){dp[i+1][j+1]=c+0.01;bt[i+1][j+1]=["typo",a,t];}}
+      else{const k=MINOR.has(t)?0.4:1;if(c+k<dp[i+1][j+1]){dp[i+1][j+1]=c+k;bt[i+1][j+1]=["sub",a,t];}}}
+    if(j<n){const k=MINOR.has(T[j])?0.3:1;if(c+k<dp[i][j+1]){dp[i][j+1]=c+k;bt[i][j+1]=["miss",null,T[j]];}}
+    if(i<m){if(c+0.05<dp[i+1][j]){dp[i+1][j]=c+0.05;bt[i+1][j]=["extra",A[i],null];}}
+  }
+  const ops=[];let i=m,j=n;while(i||j){const o=bt[i][j];ops.unshift(o);if(o[0]!=="miss")i--;if(o[0]!=="extra")j--;}
+  return ops;
+}
+function checkAnswer(input,en){
+  const A=toWords(input);
+  if(!A.length)return {level:"empty"};
+  let best=null;
+  for(const T of answerVariants(en)){
+    const ja=A.join(""),jt=T.join("");
+    if(ja===jt)return {level:"exact"};
+    if(A.length!==T.length&&lev(ja,jt)<=1)return {level:"typo",typos:[[null,A.join(" "),T.join(" ")]]};
+    const ops=alignWords(A,T);
+    const core=T.filter(w=>!MINOR.has(w)).length||T.length;
+    const coreHit=ops.filter(o=>(o[0]==="ok"||o[0]==="typo")&&!MINOR.has(o[2])).length;
+    const bad=ops.filter(o=>(o[0]==="miss"||o[0]==="sub")&&!MINOR.has(o[2])).length;
+    const r={ops,score:coreHit/core,bad,typos:ops.filter(o=>o[0]==="typo"),minor:ops.filter(o=>(o[0]==="miss"||o[0]==="sub")&&MINOR.has(o[2]))};
+    if(!best||r.bad<best.bad||(r.bad===best.bad&&r.score>best.score))best=r;
+  }
+  if(best.bad===0) best.level=best.typos.length?"typo":best.minor.length?"minor":"exact";
+  else best.level=best.score>=.5?"close":"wrong";
+  return best;
+}
+function verdictHTML(res){
+  const q=w=>`<b>${esc(w)}</b>`;
+  if(res.level==="empty")return {chip:"line",text:"Bekijk het antwoord en kies hoe goed je het wist.",grade:1};
+  if(res.level==="exact")return {chip:"green",text:"Klopt!",grade:3};
+  if(res.level==="typo")return {chip:"green",text:"Goed! Alleen de spelling: "+res.typos.map(o=>`${esc(o[1])} → ${q(o[2])}`).join(", "),grade:3};
+  if(res.level==="minor")return {chip:"green",text:"Goed! Klein verschil: "+res.minor.map(o=>o[0]==="miss"?`${q(o[2])} ontbrak`:`${esc(o[1])} → ${q(o[2])}`).join(", "),grade:3};
+  const miss=res.ops.filter(o=>o[0]==="miss"&&!MINOR.has(o[2])).map(o=>q(o[2]));
+  const sub=res.ops.filter(o=>o[0]==="sub"&&!MINOR.has(o[2])).map(o=>`${esc(o[1])} → ${q(o[2])}`);
+  const det=[miss.length?"je mist "+miss.join(", "):"",sub.length?sub.join(", "):""].filter(Boolean).join("; ");
+  if(res.level==="close")return {chip:"amber",text:"Bijna: "+det,grade:2};
+  return {chip:"red",text:"Nog niet"+(det?": "+det:"")+". Deze komt snel terug.",grade:1};
+}
 function dailyTask(){
   if(state.profile.lastDaily!==today()){state.profile.dailyIdx=((state.profile.dailyIdx||0)+1)%DAILY_TASKS.length;state.profile.lastDaily=today();save("profile");}
   return DAILY_TASKS[(state.profile.dailyIdx||0)%DAILY_TASKS.length];
@@ -565,18 +632,17 @@ function renderSession(m){
   if(S.step===0){
     const id=S.queue[S.idx],c=state.cards[id];
     if(!c){S.idx++;if(S.idx>=S.queue.length)S.step=1;return renderSession(m);}
-    const sim=S.flipped?similarity(S.input,c.en):0;
-    const sug=!S.flipped?0:!S.input?1:sim>=.95?3:sim>=.7?2:1;
-    const verdict=!S.input?"Bekijk het antwoord en kies hoe goed je het wist.":sim>=.95?"Klopt!":sim>=.7?"Bijna goed.":"Nog niet goed. Deze komt snel terug.";
+    const vd=S.flipped?verdictHTML(checkAnswer(S.input,c.en)):null;
+    const sug=vd?vd.grade:0;
     body=`<div class="spread"><span class="eyebrow">Kaart ${S.idx+1} van ${S.queue.length}</span><button class="btn link" id="skipRev">Sla herhalen over →</button></div>
     <div class="flash ${S.flipped?"flipped":""}"><div class="inner">
       <div class="glass face front"><span class="eyebrow">Hoe zeg je dit in het Engels?</span><div class="q">${esc(c.nl)}</div>
-        <input type="text" id="revIn" placeholder="Typ je antwoord en druk op Enter" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(S.input)}" ${S.flipped?"tabindex=-1":""}>
+        <input type="text" id="revIn" placeholder="Typ je antwoord en druk op Enter (spelling hoeft niet perfect)" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(S.input)}" ${S.flipped?"tabindex=-1":""}>
       </div>
       <div class="glass face back"><span class="eyebrow">${esc(c.nl)}</span><div class="a">${esc(c.en)}</div><p class="muted">${esc(c.ex)}</p>
-        ${S.input?`<p class="small">Jij schreef: <b>${esc(S.input)}</b></p>`:""}<p class="small"><span class="chip ${sim>=.95?"green":sim>=.7?"amber":"red"}">${verdict}</span></p></div>
+        ${S.input?`<p class="small">Jij schreef: <b>${esc(S.input)}</b></p>`:""}${vd?`<p class="verdict ${vd.chip}">${vd.text}</p>`:""}</div>
     </div></div>
-    ${S.flipped?`<div class="stack" style="gap:8px"><span class="small muted">Hoe goed wist je het? Na de tijd onder elke knop zie je de kaart terug.</span>
+    ${S.flipped?`<div class="stack" style="gap:8px"><span class="small muted">Jij beslist. De gemarkeerde knop is een voorstel. Onder elke knop staat wanneer de kaart terugkomt.</span>
       <div class="grade">${[["Opnieuw",1],["Moeilijk",2],["Goed",3],["Makkelijk",4]].map(([l,g])=>`<button data-g="${g}" class="${g===sug?"sug":""}">${l}<small>${fmtInt(intervalDays(c,g,Date.now()))}</small></button>`).join("")}</div></div>`
     :`<div class="row"><button class="btn teal" id="flip">Toon antwoord</button><span class="small muted">Of druk op Enter</span></div>`}`;
   }else if(S.step===1){
