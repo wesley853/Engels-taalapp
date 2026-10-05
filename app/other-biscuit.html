@@ -210,6 +210,7 @@ details summary{cursor:pointer;color:var(--teal);font-weight:600;font-size:.92re
 .feedback{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:16px 18px;border-radius:14px;animation:in .25s ease}
 .feedback.ok{background:var(--green-soft)}.feedback.no{background:var(--red-soft)}
 .chip.combo{animation:bump .4s}
+.verdict.line{background:var(--line)}
 .toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:50;background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;box-shadow:var(--shadow);animation:in .3s ease}
 .resume-bar{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-color:var(--amber)}
 .verdict{font-size:.92rem;padding:8px 12px;border-radius:10px;background:var(--line);align-self:flex-start}
@@ -792,7 +793,7 @@ function nextPhase(){
   S.phase=ph[ph.indexOf(S.phase)+1]||"done";
   if(S.phase==="new"&&!sample)S.phase="task";
 }
-function vocab(){const p=state.profile;p.vocab=p.vocab||{next:1000,known:{},test:null};return p.vocab;}
+function vocab(){const p=state.profile;p.vocab=p.vocab||{next:2000,known:{},test:null};return p.vocab;}
 const fmtNum=n=>Math.round(n).toLocaleString("nl-NL");
 let wordsLoading=false;
 async function loadNewWords(){
@@ -1113,7 +1114,7 @@ document.addEventListener("click",async e=>{
 
 /* ================= Woordspel: elk nieuw woord doorloopt 5 oefeningen, van kennismaken tot zelf typen ================= */
 const GAME_WORDS=6;
-const STEP_LABEL={intro:"Nieuw woord",mc:"Wat betekent dit?",gap:"Welk woord past in de zin?",listen:"Luister. Wat betekent het?",type:"Typ het in het Engels"};
+const STEP_LABEL={intro:"Nieuw woord · raad eerst",mc:"Wat betekent dit?",gap:"Welk woord past in de zin?",listen:"Luister. Wat betekent het?",type:"Typ het in het Engels"};
 function nlPool(words,skip){
   const own=words.filter((w,i)=>i!==skip).map(w=>w.nl);
   const deck=shuffle(Object.values(state.cards).filter(c=>c.track==="dagelijks"&&c.nl.length<30).map(c=>c.nl)).slice(0,12);
@@ -1131,7 +1132,7 @@ function pickOpts(correct,pool){
 }
 function makeOpts(s,words){
   const w=words[s.w];
-  if(s.t==="mc"||s.t==="listen"){
+  if(s.t==="mc"||s.t==="listen"||s.t==="intro"){
     const own=(w.wrong||[]).filter(x=>x.toLowerCase()!==w.nl.toLowerCase());
     if(own.length>=3)return shuffle([w.nl,...own.slice(0,3)]);
     return pickOpts(w.nl,[...own,...nlPool(words,s.w)]);
@@ -1141,7 +1142,10 @@ function makeOpts(s,words){
 }
 function buildGame(words,source){
   const n=words.length,steps=[];
-  words.forEach((w,i)=>{steps.push({t:"intro",w:i},{t:"mc",w:i});if(i>=1&&words[i-1].gap)steps.push({t:"gap",w:i-1});});
+  /* Eerst raden en onthullen; de betekenisvraag komt pas na het volgende woord, zodat je hem uit je geheugen moet halen */
+  words.forEach((w,i)=>{steps.push({t:"intro",w:i});if(i>=1)steps.push({t:"mc",w:i-1});if(i>=2&&words[i-2].gap)steps.push({t:"gap",w:i-2});});
+  if(n>=2&&words[n-2].gap)steps.push({t:"gap",w:n-2});
+  steps.push({t:"mc",w:n-1});
   if(words[n-1].gap)steps.push({t:"gap",w:n-1});
   steps.push(...shuffle(words.map((w,i)=>({t:"listen",w:i}))));
   steps.push(...shuffle(words.map((w,i)=>({t:"type",w:i}))));
@@ -1219,13 +1223,25 @@ function renderGame(m,g,o){
       let cls="";if(a){if(String(x)===String(correct))cls="right";else if(a.chosen===i)cls="wrong";}
       return `<button class="opt ${cls}" data-o="${i}" ${a?"disabled":""}><span class="key">${i+1}</span>${esc(x)}</button>`;}).join("")}</div>`;
   if(s.t==="intro"){
-    body=`<section class="glass pad stack game-card">
+    if(!s.opts)s.opts=makeOpts({t:"mc",w:s.w},g.words);
+    const gs=s.guess;
+    const gOpts=`<div class="opts">${s.opts.map((x,i)=>{let cls="";if(gs){if(String(x)===String(w.nl))cls="right";else if(gs.chosen===i)cls="wrong";}
+      return `<button class="opt ${cls}" data-o="${i}" ${gs?"disabled":""}><span class="key">${i+1}</span>${esc(x)}</button>`;}).join("")}</div>`;
+    body=gs?`<section class="glass pad stack game-card">
       <div class="spread"><span class="word-en">${esc(w.en)}</span><button class="btn ghost" id="gSay">${icon("sound")} Luister</button></div>
       <div class="word-nl">${esc(w.nl)}</div>
       <p class="muted" style="font-size:1.08rem">${boldWord(w.ex,w)}</p>
+      <p class="verdict ${gs.ok?"green":"line"}">${gs.ok?"Goed geraden! +5 XP":gs.chosen<0?"Nu weet je het. Hij komt zo terug.":"Niet geraden, geeft niks. Nu weet je het, hij komt zo terug."}</p>
     </section>
-    <div class="row"><button class="btn ghost big" id="gKnow">Ken ik al</button><button class="btn primary big" id="gNext">Volgende <span class="mono small">Enter</span></button></div>
-    <p class="small muted">Ken je hem al? Dan typ je hem meteen. Goed = woord overgeslagen en 10 XP extra.</p>`;
+    ${gOpts}
+    <div class="row"><button class="btn ghost" id="gKnow">Ken ik al</button><button class="btn primary" id="gNext" style="margin-left:auto">Volgende <span class="mono small">Enter</span></button></div>`
+    :`<section class="glass pad stack game-card">
+      <div class="spread"><span class="word-en">${esc(w.en)}</span><button class="btn ghost" id="gSay">${icon("sound")} Luister</button></div>
+      <p class="muted" style="font-size:1.08rem">${boldWord(w.ex,w)}</p>
+    </section>
+    <p class="small muted">Wat denk je dat het betekent? Gebruik de zin als hint. Fout raden kost niets: eerst gokken en dan het antwoord zien, helpt je het beter te onthouden.</p>
+    ${gOpts}
+    <div class="row" style="justify-content:center"><button class="btn link" id="gNoIdea">Geen idee <span class="mono small">0</span></button></div>`;
   }else if(s.t==="mc"){
     body=`<section class="glass pad stack game-card"><div class="spread"><span class="word-en">${esc(w.en)}</span><button class="btn ghost" id="gSay">${icon("sound")}</button></div></section>${optBtns(s.opts,w.nl)}`;
   }else if(s.t==="gap"){
@@ -1260,11 +1276,16 @@ function renderGame(m,g,o){
   const sy=$("#gSay");if(sy)sy.onclick=()=>say(w.en);
   if(s.t==="listen"&&!a)setTimeout(()=>say(w.en),150);
   if(s.t==="intro"){
-    setTimeout(()=>say(w.en),150);
-    $("#gNext").onclick=cont;
-    $("#gKnow").onclick=()=>{g.steps.splice(g.i+1,0,{t:"type",w:s.w,proof:true,opts:null});cont();};
-  }
-  m.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{const i=+b.dataset.o,x=s.opts[i],correct=s.t==="gap"?(w.form||w.en):w.nl;
+    if(!s.guess){
+      setTimeout(()=>say(w.en),150);
+      const guess=i=>{const ok=i>=0&&String(s.opts[i])===String(w.nl);s.guess={chosen:i,ok};if(ok){g.xp+=5;beep(true);}rerender();save("resume");};
+      $("#gNoIdea").onclick=()=>guess(-1);
+      m.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>guess(+b.dataset.o));
+    }else{
+      $("#gNext").onclick=cont;
+      $("#gKnow").onclick=()=>{g.steps.splice(g.i+1,0,{t:"type",w:s.w,proof:true,opts:null});cont();};
+    }
+  }else m.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{const i=+b.dataset.o,x=s.opts[i],correct=s.t==="gap"?(w.form||w.en):w.nl;
     gameAnswer(g,String(x)===String(correct),{chosen:i});rerender();});
   if(s.t==="type"&&!a){
     const inp=$("#gIn");inp.focus({preventScroll:true});
@@ -1277,7 +1298,7 @@ function renderGame(m,g,o){
   }
   const gc=$("#gCont");if(gc)gc.onclick=cont;
   const go_=$("#gOverride");if(go_)go_.onclick=()=>{gameOverride(g);cont();};
-  m._gameKeys={cont,a:!!a,step:s};
+  m._gameKeys={cont,a:s.t==="intro"?!!s.guess:!!a,step:s};
 }
 function activeGameEl(){
   if(view==="sessie"&&S.phase==="new"&&S.game&&!S.game.summary)return $("#main");
@@ -1288,7 +1309,8 @@ document.addEventListener("keydown",e=>{
   const el=activeGameEl();if(!el||!el._gameKeys)return;
   if(e.target&&e.target.id==="gIn")return;
   const k=el._gameKeys;
-  if(e.key==="Enter"){e.preventDefault();if(k.a||k.step.t==="intro")k.cont();return;}
+  if(e.key==="Enter"){e.preventDefault();if(k.a)k.cont();return;}
+  if(!k.a&&k.step.t==="intro"&&e.key==="0"){const b=el.querySelector("#gNoIdea");b&&b.click();return;}
   if(!k.a&&["1","2","3","4"].includes(e.key)){const b=el.querySelector(`[data-o="${+e.key-1}"]`);b&&b.click();}
 });
 
