@@ -799,7 +799,7 @@ let wordsLoading=false;
 async function loadNewWords(){
   const s=S;if(s.newWords||wordsLoading||!sample)return;
   wordsLoading=true;s.newErr="";if(view==="sessie")render();
-  try{s.newWords=await fetchWords(NEW_PER_SESSION);}catch(e){s.newErr=sampleError(e);}
+  try{s.newWords=await fetchWords(NEW_PER_SESSION+6);}catch(e){s.newErr=sampleError(e);}
   wordsLoading=false;if(view==="sessie")render();
 }
 /* Volgende woorden uit de frequentielijst die je nog niet kent en nog niet leert */
@@ -868,7 +868,7 @@ function renderSession(m){
         :`<p class="loading-dots">Claude zet je nieuwe woorden klaar</p><button class="btn link" id="skipNew">Sla het woordspel over →</button>`}</div>`;
     }else if(!S.newWords.length){nextPhase();return renderSession(m);}
     else{
-      if(!S.game)S.game=buildGame(S.newWords,"sessie");
+      if(!S.game)S.game=buildGame(S.newWords.slice(0,NEW_PER_SESSION),"sessie",S.newWords.slice(NEW_PER_SESSION));
       return renderGame(m,S.game,{exitLabel:"Later verder",doneLabel:"Verder naar de opdracht",
         onExit:()=>{view=null;render();},onDone:()=>{S.game=null;S.newWords=[];nextPhase();render();}});
     }
@@ -1140,7 +1140,7 @@ function makeOpts(s,words){
   if(s.t==="gap")return pickOpts(w.form||w.en,formPool(words,s.w));
   return null;
 }
-function buildGame(words,source){
+function buildGame(words,source,reserve){
   const n=words.length,steps=[];
   /* Eerst raden en onthullen; de betekenisvraag komt pas na het volgende woord, zodat je hem uit je geheugen moet halen */
   words.forEach((w,i)=>{steps.push({t:"intro",w:i});if(i>=1)steps.push({t:"mc",w:i-1});if(i>=2&&words[i-2].gap)steps.push({t:"gap",w:i-2});});
@@ -1150,7 +1150,26 @@ function buildGame(words,source){
   steps.push(...shuffle(words.map((w,i)=>({t:"listen",w:i}))));
   steps.push(...shuffle(words.map((w,i)=>({t:"type",w:i}))));
   steps.forEach(s=>s.opts=makeOpts(s,words));
-  return {words,steps,i:0,xp:0,combo:0,best:0,correct:0,total:0,errors:{},known:{},answered:null,input:"",hint:false,done:false,source,start:Date.now(),summary:null};
+  return {words,steps,i:0,xp:0,combo:0,best:0,correct:0,total:0,errors:{},known:{},likely:{},reserve:(reserve||[]).slice(),answered:null,input:"",hint:false,done:false,source,start:Date.now(),summary:null};
+}
+/* Ken je een woord al? Sla de rest over, check het aan het eind nog één keer en neem een nieuw woord erbij */
+function markLikelyKnown(g,wi){
+  if(g.likely[wi])return;
+  g.likely[wi]=true;
+  g.steps=g.steps.filter((st,k)=>k<=g.i||st.w!==wi);
+  g.steps.push({t:"type",w:wi,proof:true,opts:null});
+  if(g.reserve&&g.reserve.length){g.words.push(g.reserve.shift());insertWordSteps(g,g.words.length-1);return true;}
+  return false;
+}
+function insertWordSteps(g,wi){
+  const w=g.words[wi],at=g.i+1;
+  const add=(pos,step)=>{step.opts=makeOpts(step,g.words);g.steps.splice(Math.min(pos,g.steps.length),0,step);};
+  const endPos=()=>{const k=g.steps.findIndex((st,j)=>j>g.i&&st.proof);return k<0?g.steps.length:k;};
+  add(at,{t:"intro",w:wi});
+  add(at+2,{t:"mc",w:wi});
+  if(w.gap)add(at+4,{t:"gap",w:wi});
+  add(Math.max(at+5,endPos()-2),{t:"listen",w:wi});
+  add(endPos(),{t:"type",w:wi});
 }
 const gameStep=g=>g.steps[g.i];
 function gameAdvance(g){
@@ -1231,10 +1250,10 @@ function renderGame(m,g,o){
       <div class="spread"><span class="word-en">${esc(w.en)}</span><button class="btn ghost" id="gSay">${icon("sound")} Luister</button></div>
       <div class="word-nl">${esc(w.nl)}</div>
       <p class="muted" style="font-size:1.08rem">${boldWord(w.ex,w)}</p>
-      <p class="verdict ${gs.ok?"green":"line"}">${gs.ok?"Goed geraden! +5 XP":gs.chosen<0?"Nu weet je het. Hij komt zo terug.":"Niet geraden, geeft niks. Nu weet je het, hij komt zo terug."}</p>
+      <p class="verdict ${gs.ok?"green":"line"}">${gs.ok?`Goed geraden! +5 XP. Deze sla je verder over${gs.swapped?" en je krijgt er een nieuw woord voor terug":""}. Aan het eind typ je hem nog één keer om te checken dat je hem echt kent.`:gs.chosen<0?"Nu weet je het. Hij komt zo terug.":"Niet geraden, geeft niks. Nu weet je het, hij komt zo terug."}</p>
     </section>
     ${gOpts}
-    <div class="row"><button class="btn ghost" id="gKnow">Ken ik al</button><button class="btn primary" id="gNext" style="margin-left:auto">Volgende <span class="mono small">Enter</span></button></div>`
+    <div class="row">${gs.ok?"":`<button class="btn ghost" id="gKnow">Toch al bekend? Sla over</button>`}<button class="btn primary" id="gNext" style="margin-left:auto">Volgende <span class="mono small">Enter</span></button></div>`
     :`<section class="glass pad stack game-card">
       <div class="spread"><span class="word-en">${esc(w.en)}</span><button class="btn ghost" id="gSay">${icon("sound")} Luister</button></div>
       <p class="muted" style="font-size:1.08rem">${boldWord(w.ex,w)}</p>
@@ -1265,7 +1284,7 @@ function renderGame(m,g,o){
     <div class="spread"><button class="btn link" id="gExit">${icon("back")} ${o.exitLabel||"Stoppen"}</button>
       <div class="row" style="gap:8px"><span class="chip ${g.combo>=3?"amber combo":"line"}">${icon("spark")} combo ${g.combo}</span><span class="chip">${g.xp} XP</span><button class="btn link" id="gSound" style="padding:0 4px">${soundOn()?"Geluid aan":"Geluid uit"}</button></div></div>
     <div class="gbar"><i style="width:${pct}%"></i></div>
-    <p class="eyebrow">${STEP_LABEL[s.t]}${s.retry?" · nog een keer":""}</p>
+    <p class="eyebrow">${s.proof?"Check: ken je hem echt? Typ hem in het Engels":STEP_LABEL[s.t]}${s.retry?" · nog een keer":""}</p>
     ${body}
     ${a&&s.t!=="intro"?`<div class="feedback ${a.ok?"ok":"no"}"><div><b>${a.ok?(g.combo>=3?`Goed! Combo ${g.combo}`:"Goed!"):"Niet goed"}</b>${!a.ok&&s.t!=="type"?`<span> Het juiste antwoord: <b>${esc(s.t==="gap"?(w.form||w.en):w.nl)}</b></span>`:""}</div><div class="row">${!a.ok?`<button class="btn link" id="gOverride">Ik had het toch goed</button>`:""}<button class="btn ${a.ok?"teal":"primary"}" id="gCont">Doorgaan <span class="mono small">Enter</span></button></div></div>`:""}
   </div>`;
@@ -1278,12 +1297,12 @@ function renderGame(m,g,o){
   if(s.t==="intro"){
     if(!s.guess){
       setTimeout(()=>say(w.en),150);
-      const guess=i=>{const ok=i>=0&&String(s.opts[i])===String(w.nl);s.guess={chosen:i,ok};if(ok){g.xp+=5;beep(true);}rerender();save("resume");};
+      const guess=i=>{const ok=i>=0&&String(s.opts[i])===String(w.nl);s.guess={chosen:i,ok};if(ok){g.xp+=5;beep(true);s.guess.swapped=markLikelyKnown(g,s.w);}rerender();save("resume");};
       $("#gNoIdea").onclick=()=>guess(-1);
       m.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>guess(+b.dataset.o));
     }else{
       $("#gNext").onclick=cont;
-      $("#gKnow").onclick=()=>{g.steps.splice(g.i+1,0,{t:"type",w:s.w,proof:true,opts:null});cont();};
+      const kn=$("#gKnow");if(kn)kn.onclick=()=>{markLikelyKnown(g,s.w);cont();};
     }
   }else m.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{const i=+b.dataset.o,x=s.opts[i],correct=s.t==="gap"?(w.form||w.en):w.nl;
     gameAnswer(g,String(x)===String(correct),{chosen:i});rerender();});
@@ -1362,7 +1381,7 @@ function finishTest(){
 async function startWordGame(){
   if(!sample||WD.gameLoading)return;
   WD.gameLoading=true;WD.gameErr="";render();
-  try{const words=await fetchWords(GAME_WORDS);if(!words.length)throw {message:"Geen nieuwe woorden meer gevonden."};WD.game=buildGame(words,"los");window.scrollTo({top:0});}
+  try{const words=await fetchWords(GAME_WORDS+6);if(!words.length)throw {message:"Geen nieuwe woorden meer gevonden."};WD.game=buildGame(words.slice(0,GAME_WORDS),"los",words.slice(GAME_WORDS));window.scrollTo({top:0});}
   catch(e){WD.gameErr=e&&e.code?sampleError(e):(e&&e.message)||"Het woordspel kon niet starten.";}
   WD.gameLoading=false;render();
 }
